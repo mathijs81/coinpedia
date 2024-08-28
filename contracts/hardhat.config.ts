@@ -16,7 +16,7 @@ function getRemappings() {
 
 task("example", "Example task").setAction(example);
 
-const config: HardhatUserConfig = {
+const config = {
   solidity: {
     version: "0.8.13",
     settings: {
@@ -29,21 +29,6 @@ const config: HardhatUserConfig = {
   paths: {
     sources: "./src", // Use ./src rather than ./contracts as Hardhat expects
     cache: "./cache_hardhat", // Use a different cache for Hardhat than Foundry
-  },
-  // This fully resolves paths for imports in the ./lib directory for Hardhat
-  preprocess: {
-    eachLine: (hre) => ({
-      transform: (line: string) => {
-        if (line.match(/^\s*import /i)) {
-          getRemappings().forEach(([find, replace]) => {
-            if (line.match(find)) {
-              line = line.replace(find, replace);
-            }
-          });
-        }
-        return line;
-      },
-    }),
   },
 };
 
