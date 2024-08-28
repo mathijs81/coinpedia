@@ -1,0 +1,25 @@
+$font-family-sans-serif: "Rubik", Arial, Helvetica, sans-serif;
+$modal-content-color: #333;
+//https://colorhunt.co/palette/05921206d0019bec00f3ff90
+$primary: #059212;
+
+@import "bootstrap/scss/bootstrap";
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: "Lilita One", sans-serif;
+}
+
+body {
+    background: rgb(255, 251, 244);
+}
+
+.top-header {
+    background: linear-gradient(45deg, darken($primary, 5%), darken($primary, 20%));
+    border-bottom: 1px solid #e9ecef;
+    color: white;
+}
