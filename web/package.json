@@ -6,9 +6,13 @@
     "scripts": {
         "dev": "vite",
         "build": "vite build",
-        "preview": "vite preview"
+        "preview": "vite preview",
+		"lint": "prettier --check . && eslint .",
+		"format": "prettier --write ."
     },
     "devDependencies": {
+        "@sveltejs/adapter-auto": "^3.2.4",
+        "@sveltejs/kit": "^2.5.25",
         "@sveltejs/vite-plugin-svelte": "^3.1.2",
         "autoprefixer": "^10.4.20",
         "eslint": "^9.9.1",
@@ -30,6 +34,9 @@
         "vite": "^5.4.2"
     },
     "dependencies": {
-        "bootstrap": "^5.3.3"
+        "@web3-onboard/core": "^2.22.2",
+        "@web3-onboard/injected-wallets": "^2.11.2",
+        "bootstrap": "^5.3.3",
+        "viem": "^2.20.1"
     }
 }
