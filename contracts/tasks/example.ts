@@ -12,3 +12,4 @@ export default async function example(
     `Balance for 1st account ${await account.getAddress()}: ${await account.getBalance()}`
   );
 }
+
