@@ -4,6 +4,7 @@ export default async function deploy_hook(
     params: any,
     hre: HardhatRuntimeEnvironment,
   ): Promise<void> {
+    await hre.run("compile");
   
     const ethers = hre.ethers;
     const [account] = await ethers.getSigners();

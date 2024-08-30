@@ -30,6 +30,10 @@ const config = {
     baseSepolia: {
       url: "https://sepolia.base.org",
       accounts: [process.env.TESTNET_PRIVATE_KEY]
+    },
+    baseSepolia2: {
+      url: "https://sepolia.base.org",
+      accounts: [process.env.TESTNET_PRIVATE_KEY2]
     }
   }
 };
