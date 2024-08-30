@@ -1,7 +1,7 @@
 import { EvmChains, IndexService, SignProtocolClient, SpMode, type Attestation } from "@ethsign/sp-sdk";
 
-const schemaId = '0x152';
-const fullSchemaId = 'onchain_evm_84532_0x152';
+const schemaId = '0x16f';
+const fullSchemaId = 'onchain_evm_84532_0x16f';
 
 const client = new SignProtocolClient(SpMode.OnChain, {
     chain: EvmChains.baseSepolia
@@ -29,8 +29,7 @@ export async function attest(coinAddress: string, data: CoinData) {
     const attestationData = {
             coin: coinAddress,
             description: data.description,
-            // TODO: make icon a string var instead of bytes32
-            icon: "0".repeat(32),
+            icon: data.icon,
             website: data.website,
             socials: JSON.stringify(data.socials)
         };
@@ -49,7 +48,6 @@ export async function lookupData(coinAddress: string): Promise<CoinData | null> 
         page: 1
     });
     const rows = result?.rows;
-    console.log(`lookup data -- ${JSON.stringify(result)}`);
     if (!rows || rows.length === 0) return null;
     console.log(rows[0]);
     return null;

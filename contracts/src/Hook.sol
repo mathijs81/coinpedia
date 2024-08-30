@@ -4,12 +4,15 @@ pragma solidity ^0.8.20;
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {ISPHook} from "@ethsign/sign-protocol-evm/src/interfaces/ISPHook.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {Attestation} from "@ethsign/sign-protocol-evm/src/models/Attestation.sol";
+import {ISP} from "@ethsign/sign-protocol-evm/src/interfaces/ISP.sol";
 
 /**
  * Hook to make sure that attestations are done by whitelisted contracts or 
  * TODO: the owner of the ERC20 token that the attestation is about
  */
 contract OwnerCheckHook is ISPHook, Ownable {
+    ISP public spInstance;
     mapping(address attester => bool allowed) public whitelist;
     error UnauthorizedAttester();
 
@@ -19,22 +22,28 @@ contract OwnerCheckHook is ISPHook, Ownable {
         whitelist[attester] = allowed;
     }
 
+    function setSPInstance(address instance) external onlyOwner {
+        spInstance = ISP(instance);
+    }
+
     function _checkAttester(address attester, address token) internal view {
         // check if token is an ownable contract
         
-        // address coinOwner = IERC20(token).owner();
-        // if (attester != coinOwner && attester != owner() && !whitelist[attester]) {
-        //     revert UnauthorizedAttester();
-        // }
-
-        if (attester != owner() && !whitelist[attester]) {
-            revert UnauthorizedAttester();
+        address coinOwner = address(0);
+        try Ownable(token).owner() returns (address owner) {
+            coinOwner = owner;
+        } catch {
+            // it's probably not an ownable contract.
+        }
+        if (attester != coinOwner && attester != owner() && !whitelist[attester]) {
+             revert UnauthorizedAttester();
         }
     }
 
-    function extractTokenAddress(uint64 attestationId) internal pure returns (address) {
-        // TODO: look up attestation, extract token address
-        return address(0);
+    function extractTokenAddress(uint64 attestationId) internal view returns (address) {
+        Attestation memory attestation = spInstance.getAttestation(attestationId);
+        (address tokenAddress) = abi.decode(attestation.data, (address));
+        return tokenAddress;
     }
 
        function didReceiveAttestation(
@@ -58,7 +67,7 @@ contract OwnerCheckHook is ISPHook, Ownable {
     }
 
     function didReceiveRevocation(
-        address attester,
+        address,
         uint64,
         uint64,
         bytes calldata
@@ -67,13 +76,13 @@ contract OwnerCheckHook is ISPHook, Ownable {
     }
 
     function didReceiveRevocation(
-        address attester,
+        address,
         uint64,
         uint64,
         IERC20,
         uint256,
         bytes calldata
-    ) external view {
+    ) external pure {
         revert("not supported");
     }
 }
