@@ -1,4 +1,5 @@
 import { EvmChains, IndexService, SignProtocolClient, SpMode, type Attestation } from "@ethsign/sp-sdk";
+import { decodeAbiParameters, parseAbiParameters } from "viem";
 
 const schemaId = '0x16f';
 const fullSchemaId = 'onchain_evm_84532_0x16f';
@@ -49,6 +50,14 @@ export async function lookupData(coinAddress: string): Promise<CoinData | null> 
     });
     const rows = result?.rows;
     if (!rows || rows.length === 0) return null;
-    console.log(rows[0]);
-    return null;
+    // console.log(rows);
+    // console.log(rows[rows.length-1]);
+    const decoded = decodeAbiParameters(parseAbiParameters('address,string,string,string,string'),
+        rows[0].data as `0x${string}`);
+    return {
+        description: decoded[1],
+        icon: decoded[2],
+        website: decoded[3],
+        socials: JSON.parse(decoded[4])
+    };
 }

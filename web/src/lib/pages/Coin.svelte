@@ -11,6 +11,14 @@
   let iconUrl = '';
   let errorMessage = '';
 
+  currentData.then(data => {
+    if (data) {
+      description = data.description;
+      website = data.website;
+      iconUrl = data.icon;
+    }
+  });
+
   const handleSubmit = async () => {
     errorMessage = '';
     try {
@@ -47,6 +55,17 @@
     {:else}
       <p>This coin is not ownable.</p>
     {/if}
+    {#await currentData then current}
+      {#if current}
+        <h4>Current data</h4>
+        <b>Description</b>
+        <p>{current.description}</p>
+        <b>Website</b>
+        <p><a href={current.website} target="_blank">{current.website}</a></p>
+        <b>Icon</b>
+        <p><img src={current.icon} alt="icon" /><br /><small>{current.icon}</small></p>
+      {/if}
+    {/await}
 
     <form on:submit|preventDefault={handleSubmit} class="needs-validation" novalidate>
       <div class="mb-3">
