@@ -13,9 +13,9 @@
   <div class="container-md">
     <div class="row align-items-center">
       <div class="col d-flex align-items-center">
-        <img src={Logo} alt="OnChain Coin Data" class="logo-img" />
+        <img src={Logo} alt="Coinpedia" class="logo-img" />
         <div>
-          <h1 class="fs-3 m-0 p-0">OnChain Coin Data</h1>
+          <h1 class="fs-3 m-0 p-0">Coinpedia</h1>
           <small class="d-block" style="margin-top: -5px"
             >Collecting ERC-20 metadata for everyone</small>
         </div>

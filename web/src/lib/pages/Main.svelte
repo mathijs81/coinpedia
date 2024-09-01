@@ -8,7 +8,7 @@
 <div>
   <!-- <Body />
         <Graphics /> -->
-  <h2>Welcome to OnChain Coin Data</h2>
+  <h2>Welcome to Coinpedia</h2>
 
   Here you can register your coins.
 
