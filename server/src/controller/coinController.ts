@@ -64,6 +64,8 @@ const getCoins = memoizee(queryCoins24h, { maxAge: 5 * 60 * 1000, promise: true 
 export default async function coinController(fastify: FastifyInstance) {
   for (const [name, chainSetting] of Object.entries(chains)) {
     fastify.get('/' + name, async function (_request: FastifyRequest, reply: FastifyReply) {
+      reply.header("Access-Control-Allow-Origin", "*");
+      reply.header("Access-Control-Allow-Methods", "GET");
       const coins = await getCoins(chainSetting);
       reply.send(coins);
     });
