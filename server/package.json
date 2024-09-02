@@ -12,10 +12,16 @@
   "author": "Matschik <mathieu.schimmerling@protonmail.com>",
   "license": "MIT",
   "dependencies": {
-    "@envio-dev/hypersync-client-node": "0.0.0-test-deploy",
-    "fastify": "^4.28.1"
+    "@envio-dev/hypersync-client": "^0.6.2",
+    "@keyv/sqlite": "^4.0.1",
+    "fastify": "^4.28.1",
+    "keyv": "^5.0.1",
+    "memoizee": "^0.4.17",
+    "rate-limiter-flexible": "^5.0.3",
+    "viem": "^2.21.1"
   },
   "devDependencies": {
+    "@types/memoizee": "^0.4.11",
     "@types/node": "^22.5.2",
     "cross-env": "^7.0.3",
     "fastify-tsconfig": "^2.0.0",
