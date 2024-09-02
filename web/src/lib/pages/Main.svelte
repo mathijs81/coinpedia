@@ -1,6 +1,6 @@
 <script lang="ts">
   import UnknownCoin from '../../assets/unknown-coin.svg';
-  import { goto } from '$app/navigation';
+  import {goto} from '$app/navigation';
   const coins = (async () => {
     const response = await fetch('https://coins.vogelcode.com/api/v1/coin/base-sepolia');
     const coins = await response.json();
@@ -26,6 +26,15 @@
     <p>loading...</p>
   {:then coins}
     <table class="table table-striped table-hover">
+      <thead>
+        <tr>
+          <th></th>
+          <th>Symbol</th>
+          <th>Name</th>
+          <th>Description</th>
+          <th class="transact-col">Transfers <small>(last 24h)</small></th>
+        </tr>
+      </thead>
       <tbody>
         {#each coins as coin}
           <tr on:click={() => goto(`/coin/${coin.address}`)}>
@@ -35,6 +44,7 @@
               ><a href="/coin/{coin.address}"><code>{coin.symbol}</code></a>
             </td><td><a href="/coin/{coin.address}">{coin.name}</a></td>
             <td>{coin.description}</td>
+            <td class="transact-col">{coin.transactionCount}</td>
           </tr>
         {/each}
       </tbody>
@@ -58,5 +68,9 @@
   .icon-col {
     width: 3rem;
     text-align: center;
+  }
+  .transact-col {
+    text-align: right;
+    max-width: 10ch;
   }
 </style>

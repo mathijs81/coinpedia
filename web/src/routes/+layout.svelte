@@ -10,7 +10,7 @@
   <main class="d-flex flex-column" style="min-height: 100vh">
     <Header />
     <div class="flex-grow-1 container my-3">
-        <slot />
+      <slot />
     </div>
     <Footer />
   </main>
