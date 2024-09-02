@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@envio-dev/hypersync-client-node':
+        specifier: 0.0.0-test-deploy
+        version: 0.0.0-test-deploy
       fastify:
         specifier: ^4.28.1
         version: 4.28.1
@@ -38,6 +41,9 @@ importers:
         version: 5.5.4
 
 packages:
+
+  '@envio-dev/hypersync-client-node@0.0.0-test-deploy':
+    resolution: {integrity: sha512-cGlzrU1fQXqSRlsxeJuweudhZGn9te8xSNgbz+GROB4DUyivFow4x0U29gZQX5tCy1JkBHcwy1xhHt25m8PIxg==}
 
   '@fastify/ajv-compiler@3.6.0':
     resolution: {integrity: sha512-LwdXQJjmMD+GwLOkP7TVC68qa+pSSogeWWmznRJ/coyTcfe9qA05AHFSe1eZFwK6q+xVRpChnvFUkf1iYaSZsQ==}
@@ -542,6 +548,8 @@ packages:
     engines: {node: '>=12'}
 
 snapshots:
+
+  '@envio-dev/hypersync-client-node@0.0.0-test-deploy': {}
 
   '@fastify/ajv-compiler@3.6.0':
     dependencies:

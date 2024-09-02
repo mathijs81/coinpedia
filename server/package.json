@@ -12,6 +12,7 @@
   "author": "Matschik <mathieu.schimmerling@protonmail.com>",
   "license": "MIT",
   "dependencies": {
+    "@envio-dev/hypersync-client-node": "0.0.0-test-deploy",
     "fastify": "^4.28.1"
   },
   "devDependencies": {
