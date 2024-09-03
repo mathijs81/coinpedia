@@ -13,11 +13,16 @@
   <div class="container-md">
     <div class="row align-items-center">
       <div class="col d-flex align-items-center">
-        <img src={Logo} alt="Coinpedia" class="logo-img" />
+        <a href="/">
+          <img src={Logo} alt="Coinpedia" class="logo-img" />
+        </a>
+
         <div>
-          <h1 class="fs-3 m-0 p-0">Coinpedia</h1>
-          <small class="d-block" style="margin-top: -5px"
-            >Collecting ERC-20 metadata for everyone</small>
+          <a href="/" class="link-unstyled">
+            <h1 class="fs-3 m-0 p-0">Coinpedia</h1>
+            <small class="d-block" style="margin-top: -5px"
+              >Collecting ERC-20 metadata for everyone</small>
+          </a>
         </div>
       </div>
       <div class="col">

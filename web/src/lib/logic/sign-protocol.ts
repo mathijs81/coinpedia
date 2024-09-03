@@ -6,6 +6,7 @@ import {
   type Attestation
 } from '@ethsign/sp-sdk';
 import {decodeAbiParameters, parseAbiParameters} from 'viem';
+import type {ChainString} from './onchain-data';
 
 const schemaId = '0x16f';
 const fullSchemaId = 'onchain_evm_84532_0x16f';
@@ -51,8 +52,10 @@ export async function attest(coinAddress: string, data: CoinData) {
 }
 
 export async function lookupData(
+  chain: ChainString,
   coinAddress: string
 ): Promise<CoinData | null> {
+  // TODO: use ChainString
   const result = await index.queryAttestationList({
     schemaId: fullSchemaId,
     indexingValue: coinAddress,

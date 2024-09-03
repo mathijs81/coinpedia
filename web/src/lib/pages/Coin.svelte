@@ -1,10 +1,14 @@
 <script lang="ts">
   import {page} from '$app/stores';
-  import {getOnchain} from '$lib/logic/onchain-data';
+  import {activeChain} from '$lib/auth/store';
+  import {fromString} from '$lib/auth/types';
+  import {getOnchain, toChainString} from '$lib/logic/onchain-data';
   import {attest, lookupData} from '$lib/logic/sign-protocol';
-  let address = $page.params.address;
-  const onChainData = getOnchain(address);
-  const currentData = lookupData(address);
+  let chain = toChainString($page.params.chain);
+  activeChain.set(fromString(chain));
+  let address = $page.params.address as `0x${string}`;
+  const onChainData = getOnchain(chain, address);
+  const currentData = lookupData(chain, address);
 
   let description = '';
   let website = '';
@@ -50,10 +54,10 @@
     <p>loading...</p>
   {:then data}
     <h3>{data.name} <code>({data.symbol})</code></h3>
-    {#if data.isOwnable}
+    {#if data.isOwnable && data.owner !== '0x0000000000000000000000000000000000000000'}
       <p>This coin is owned by {data.owner}.</p>
     {:else}
-      <p>This coin is not ownable.</p>
+      <p>This coin has no owner.</p>
     {/if}
     {#await currentData then current}
       {#if current}

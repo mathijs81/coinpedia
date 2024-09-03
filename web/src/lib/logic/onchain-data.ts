@@ -11,7 +11,10 @@ interface OnChainData {
 
 const ownableAbi = parseAbi(['function owner() view returns (address)']);
 
-export async function getOnchain(address: `0x${string}`): Promise<OnChainData> {
+export async function getOnchain(
+  chain: ChainString,
+  address: `0x${string}`
+): Promise<OnChainData> {
   const client = get(publicClient);
   const contract = getContract({
     address,
@@ -39,4 +42,11 @@ export async function getOnchain(address: `0x${string}`): Promise<OnChainData> {
     isOwnable: owner !== null,
     owner
   };
+}
+
+export type ChainString = 'base' | 'base-sepolia';
+
+export function toChainString(chain: string | null): ChainString {
+  if (chain === 'base') return 'base';
+  return 'base-sepolia';
 }
