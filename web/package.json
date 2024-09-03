@@ -37,6 +37,6 @@
     "@web3-onboard/core": "^2.22.2",
     "@web3-onboard/injected-wallets": "^2.11.2",
     "bootstrap": "^5.3.3",
-    "viem": "^2.20.1"
+    "viem": "^2.21.1"
   }
 }

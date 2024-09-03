@@ -1,8 +1,11 @@
 <script lang="ts">
+  import {activeChain} from '$lib/auth/store';
+  import {Chains} from '$lib/auth/types';
   import type {ChainString} from '$lib/logic/onchain-data';
+  import {get} from 'svelte/store';
   import CoinOverview from './CoinOverview.svelte';
 
-  let activeChain: ChainString = 'base-sepolia';
+  let currentChain: ChainString = get(activeChain) === Chains.BASE ? 'base' : 'base-sepolia';
 </script>
 
 <div>
@@ -11,19 +14,19 @@
     <li class="nav-item">
       <a
         class="nav-link"
-        class:active={activeChain == 'base-sepolia'}
-        on:click={() => (activeChain = 'base-sepolia')}
+        class:active={currentChain == 'base-sepolia'}
+        on:click={() => (currentChain = 'base-sepolia')}
         href="#">Base Sepolia</a>
     </li>
     <li class="nav-item">
       <a
         class="nav-link"
-        class:active={activeChain == 'base'}
-        on:click={() => (activeChain = 'base')}
+        class:active={currentChain == 'base'}
+        on:click={() => (currentChain = 'base')}
         href="#">Base</a>
     </li>
   </ul>
-  <CoinOverview chain={activeChain} />
+  <CoinOverview chain={currentChain} />
 </div>
 
 <style>

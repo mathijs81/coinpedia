@@ -1,7 +1,7 @@
 <script lang="ts">
   import '../index.scss';
-  import Header from '../lib/sections/Header.svelte';
   import Footer from '../lib/sections/Footer.svelte';
+  import Header from '../lib/sections/Header.svelte';
 
   import AuthProvider from '$lib/auth/AuthProvider.svelte';
 </script>
