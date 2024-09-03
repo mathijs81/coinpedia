@@ -40,11 +40,20 @@ import { ChainSetting } from '../constants';
 const keyvSqlite = new KeyvSqlite('sqlite://coins.sqlite');
 const keyv = new Keyv({ store: keyvSqlite, namespace: 'coin' });
 
+let coinRequests = 0;
+let cacheHits = 0;
+
 export async function getCoin(chainSetting: ChainSetting, address: string): Promise<CoinData> {
   let value = await keyv.get<CoinData>(chainSetting.prefix + address);
+  coinRequests++;
+  if (coinRequests % 100 == 0) {
+    console.log(`cache hits: ${cacheHits} / ${coinRequests}, rate: ${cacheHits / coinRequests}`);
+  }
   if (!value) {
     value = await queryOnchainCoindata(chainSetting, address);
-    keyv.set(address, value);
+    keyv.set(chainSetting.prefix + address, value);
+  } else {
+    cacheHits++;
   }
   return value;
 }
