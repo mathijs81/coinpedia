@@ -9,7 +9,7 @@ import {ISP} from "@ethsign/sign-protocol-evm/src/interfaces/ISP.sol";
 
 /**
  * Hook to make sure that attestations are done by whitelisted contracts or 
- * TODO: the owner of the ERC20 token that the attestation is about
+ * the owner of the ERC20 token that the attestation is about
  */
 contract OwnerCheckHook is ISPHook, Ownable {
     ISP public spInstance;
@@ -30,10 +30,17 @@ contract OwnerCheckHook is ISPHook, Ownable {
         // check if token is an ownable contract
         
         address coinOwner = address(0);
-        try Ownable(token).owner() returns (address owner) {
-            coinOwner = owner;
-        } catch {
-            // it's probably not an ownable contract.
+
+        // Note: we skip the Ownable check if the 'token' address is not a contract.
+        // This normally doesn't make sense, but for the hackathon we want to be able
+        // to attest metadata for base (production) coins on base-sepolia and if we don't
+        // skip this check we can't demonstrate the lit/ape.store integration
+        if (token.code.length > 0) {
+            try Ownable(token).owner() returns (address owner) {
+                coinOwner = owner;
+            } catch {
+                // it's probably not an ownable contract.
+            }
         }
         if (attester != coinOwner && attester != owner() && !whitelist[attester]) {
              revert UnauthorizedAttester();
@@ -46,7 +53,7 @@ contract OwnerCheckHook is ISPHook, Ownable {
         return tokenAddress;
     }
 
-       function didReceiveAttestation(
+    function didReceiveAttestation(
         address attester,
         uint64,
         uint64 attestationId,
