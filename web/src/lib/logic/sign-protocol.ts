@@ -7,6 +7,7 @@ import {
 } from '@ethsign/sp-sdk';
 import {decodeAbiParameters, parseAbiParameters} from 'viem';
 import type {ChainString} from './onchain-data';
+import type {CoinData} from './types';
 
 const schemaId = '0x16f';
 const fullSchemaId = 'onchain_evm_84532_0x16f';
@@ -16,24 +17,6 @@ const client = new SignProtocolClient(SpMode.OnChain, {
 });
 
 const index = new IndexService('testnet');
-
-enum SocialNetwork {
-  X,
-  TELEGRAM,
-  DISCORD
-}
-
-interface SocialNetworkEntry {
-  type: SocialNetwork;
-  url: string;
-}
-
-interface CoinData {
-  description: string;
-  icon: string;
-  website: string;
-  socials: SocialNetwork[];
-}
 
 export async function attest(coinAddress: string, data: CoinData) {
   const attestationData = {
@@ -55,7 +38,7 @@ export async function lookupData(
   chain: ChainString,
   coinAddress: string
 ): Promise<CoinData | null> {
-  // TODO: use ChainString
+  // TODO: use ChainString for sign protocol
   const result = await index.queryAttestationList({
     schemaId: fullSchemaId,
     indexingValue: coinAddress,

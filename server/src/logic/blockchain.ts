@@ -1,4 +1,5 @@
 import { erc20Abi, getContract } from 'viem';
+import { keyv } from './cache';
 
 export async function getLatestBlock(chainSetting: ChainSetting): Promise<bigint> {
   return await chainSetting.client.getBlockNumber();
@@ -9,14 +10,6 @@ interface CoinData {
   name: string;
 }
 
-import { RateLimiterMemory, RateLimiterQueue } from 'rate-limiter-flexible';
-
-const rateLimiter = new RateLimiterMemory({
-  points: 4,
-  duration: 1,
-});
-const queue = new RateLimiterQueue(rateLimiter);
-
 export async function queryOnchainCoindata(
   chainSetting: ChainSetting,
   address: string
@@ -26,19 +19,14 @@ export async function queryOnchainCoindata(
     address: address as `0x${string}`,
     client: chainSetting.client,
   });
-  await queue.removeTokens(1, chainSetting.prefix);
+  await limitQueue.removeTokens(1, chainSetting.prefix);
   const symbol = await contract.read.symbol();
   const name = await contract.read.name();
   return { symbol, name };
 }
 
-// Cache using keyv
-import KeyvSqlite from '@keyv/sqlite';
-import Keyv from 'keyv';
 import { ChainSetting } from '../constants';
-
-const keyvSqlite = new KeyvSqlite('sqlite://coins.sqlite');
-const keyv = new Keyv({ store: keyvSqlite, namespace: 'coin' });
+import { limitQueue } from './ratelimit';
 
 let coinRequests = 0;
 let cacheHits = 0;

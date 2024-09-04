@@ -1,5 +1,5 @@
 <script lang="ts">
-  import {goto, onNavigate} from '$app/navigation';
+  import {goto} from '$app/navigation';
   import {fetchCoinOverview, getCoinOverview} from '$lib/logic/coin-overview-data';
 
   export let chain: 'base' | 'base-sepolia' = 'base-sepolia';
@@ -7,11 +7,9 @@
   // We get whatever is in the cache, and update it if needed
   // if we don't initialize it directly here, then the component will not be ready to be able
   // to scroll back to where you were if you e.g. press back in the browser
+  $: chainName = chain === 'base' ? 'Base' : 'Base Sepolia';
   let coins = getCoinOverview(chain);
   $: fetchCoinOverview(chain).then(data => (coins = data));
-  $: chainName = chain === 'base' ? 'Base' : 'Base Sepolia';
-
-  onNavigate;
 </script>
 
 <div>

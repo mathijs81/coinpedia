@@ -7,6 +7,7 @@ export interface ChainSetting {
   client: PublicClient;
   prefix: string;
   hypersyncClient: HypersyncClient;
+  hasApeStore: boolean;
 }
 
 // hypersync URLs: https://docs.envio.dev/docs/HyperSync/hypersync-supported-networks
@@ -18,6 +19,7 @@ const baseSepoliaSetting: ChainSetting = {
   }) as PublicClient,
   prefix: 'base-sep/',
   hypersyncClient: HypersyncClient.new({ url: 'https://base-sepolia.hypersync.xyz' }),
+  hasApeStore: false,
 };
 
 const baseSetting: ChainSetting = {
@@ -28,6 +30,7 @@ const baseSetting: ChainSetting = {
   }) as PublicClient,
   prefix: 'base/',
   hypersyncClient: HypersyncClient.new({ url: 'https://base.hypersync.xyz' }),
+  hasApeStore: true,
 };
 
 export const chains = {

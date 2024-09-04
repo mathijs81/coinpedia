@@ -4,6 +4,7 @@ import memoizee from 'memoizee';
 import { encodeEventTopics, erc20Abi } from 'viem';
 import { getCoin, getLatestBlock } from '../logic/blockchain';
 import { chains, ChainSetting } from '../constants';
+import { fetchApeData } from '../logic/ape-store';
 
 interface Coin {
   address: `0x${string}`;
@@ -48,12 +49,25 @@ async function queryCoins24h(chainSetting: ChainSetting) {
     .sort((a, b) => b[1] - a[1])
     .slice(0, 100);
 
+  async function apedata(address: string) {
+    if (!chainSetting.hasApeStore) {
+      return {};
+    }
+    try {
+      return (await fetchApeData(address)) ?? {};
+    } catch (e) {
+      console.error(e);
+      return {};
+    }
+  }
+
   const promises = top100.map(
     async ([address, transactionCount]) =>
       ({
         address,
         transactionCount,
         ...(await getCoin(chainSetting, address)),
+        apestore: await apedata(address),
       }) as Coin
   );
   return await Promise.all(promises);
@@ -64,11 +78,10 @@ const getCoins = memoizee(queryCoins24h, { maxAge: 5 * 60 * 1000, promise: true 
 export default async function coinController(fastify: FastifyInstance) {
   for (const [name, chainSetting] of Object.entries(chains)) {
     fastify.get('/' + name, async function (_request: FastifyRequest, reply: FastifyReply) {
-      reply.header("Access-Control-Allow-Origin", "*");
-      reply.header("Access-Control-Allow-Methods", "GET");
+      reply.header('Access-Control-Allow-Origin', '*');
+      reply.header('Access-Control-Allow-Methods', 'GET');
       const coins = await getCoins(chainSetting);
       reply.send(coins);
     });
   }
-  // GET /api/v1/coin
 }

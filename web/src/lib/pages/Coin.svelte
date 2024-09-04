@@ -4,6 +4,7 @@
   import {fromString} from '$lib/auth/types';
   import {getOnchain, toChainString} from '$lib/logic/onchain-data';
   import {attest, lookupData} from '$lib/logic/sign-protocol';
+  import type {CoinData} from '$lib/logic/types';
   let chain = toChainString($page.params.chain);
   activeChain.set(fromString(chain));
   let address = $page.params.address as `0x${string}`;
@@ -48,8 +49,6 @@
 </script>
 
 <div>
-  Hello coin {address}
-
   {#await onChainData}
     <p>loading...</p>
   {:then data}
