@@ -1,6 +1,7 @@
 <script lang="ts">
   import {goto} from '$app/navigation';
   import {fetchCoinOverview, getCoinOverview} from '$lib/logic/coin-overview-data';
+  import UnknownIcon from '../../assets/unknown-coin.svg';
 
   export let chain: 'base' | 'base-sepolia' = 'base-sepolia';
 
@@ -8,19 +9,41 @@
   // if we don't initialize it directly here, then the component will not be ready to be able
   // to scroll back to where you were if you e.g. press back in the browser
   $: chainName = chain === 'base' ? 'Base' : 'Base Sepolia';
-  let coins = getCoinOverview(chain);
+  $: coins = getCoinOverview(chain);
   $: fetchCoinOverview(chain).then(data => (coins = data));
+  let unconfirmedData = false;
+
+  $: getIcon = (coin: any) => {
+    return coin.icon || (unconfirmedData ? coin.apestore?.icon : null) || UnknownIcon;
+  };
+
+  $: getDescription = (coin: any) => {
+    return (
+      coin.description ||
+      (unconfirmedData ? coin.apestore?.description : null) ||
+      'No description (yet)'
+    );
+  };
 </script>
 
 <div>
   <h3>Top coins on {chainName}</h3>
+  {#if chain == 'base'}
+    <div class="sticky-top bg-light p-2">
+      <input
+        type="checkbox"
+        id="unconfirmed-data"
+        bind:checked={unconfirmedData}
+        class="form-check-input me-2" /><label for="unconfirmed-data">Show unconfirmed data</label>
+    </div>
+  {/if}
   <table class="table table-striped table-hover">
     <thead>
       <tr>
-        <th></th>
-        <th>Symbol</th>
-        <th>Name</th>
-        <th>Description</th>
+        <th class="icon-col"></th>
+        <th class="symbol-col">Symbol</th>
+        <th class="name-col">Name</th>
+        <th class="desc-col">Description</th>
         <th class="transact-col">Transfers <small>(last 24h)</small></th>
       </tr>
     </thead>
@@ -28,11 +51,11 @@
       {#each coins as coin}
         <tr on:click={() => goto(`/coin/${chain}/${coin.address}`)}>
           <td class="icon-col"
-            ><img src={coin.icon} alt="icon for {coin.symbol}" class="coin-icon" /></td>
+            ><img src={getIcon(coin)} alt="icon for {coin.symbol}" class="coin-icon" /></td>
           <td class="symbol-col"
             ><a href="/coin/{chain}/{coin.address}"><code>{coin.symbol}</code></a>
           </td><td><a href="/coin/{chain}/{coin.address}">{coin.name}</a></td>
-          <td>{coin.description}</td>
+          <td>{getDescription(coin)}</td>
           <td class="transact-col">{coin.transactionCount}</td>
         </tr>
       {/each}
@@ -41,11 +64,17 @@
 </div>
 
 <style>
+  table {
+    table-layout: fixed;
+  }
   .symbol-col {
-    max-width: 4ch;
+    width: 100px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+  .name-col {
+    width: 20ch;
   }
 
   .coin-icon {
@@ -59,6 +88,6 @@
   }
   .transact-col {
     text-align: right;
-    max-width: 10ch;
+    width: 10ch;
   }
 </style>

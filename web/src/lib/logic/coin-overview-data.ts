@@ -19,16 +19,11 @@ async function fetchData(chain: ChainString) {
   if (!Array.isArray(coins)) {
     throw new Error('Invalid response from server -- ' + JSON.stringify(coins));
   }
-  const result = coins.map(coin => ({
-    ...coin,
-    icon: coin.icon ?? UnknownCoin,
-    description: coin.description ?? 'No description (yet)'
-  }));
   cache[chain] = {
-    data: result,
+    data: coins,
     timestamp: Date.now()
   };
-  return result;
+  return coins;
 }
 
 export function getCoinOverview(chain: ChainString) {
