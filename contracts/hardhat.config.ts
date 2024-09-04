@@ -7,10 +7,12 @@ import { HardhatUserConfig, task } from "hardhat/config";
 import example from "./tasks/example";
 import deploy_token from "./tasks/deploy_token";
 import deploy_hook from "./tasks/deploy_hook";
+import add_whitelisted_address from "./tasks/add_whitelisted_address";
 
 task("example", "Example task").setAction(example);
 task("deploy_token", "Deploy token").setAction(deploy_token);
 task("deploy_hook", "Deploy hook").setAction(deploy_hook);
+task("add_whitelisted_address").addParam("hook").addParam("whitelisted").setAction(add_whitelisted_address);
 
 const config = {
   solidity: {
