@@ -1,4 +1,5 @@
 import fastify from 'fastify';
+import 'dotenv/config';
 import router from './router';
 
 const server = fastify({
