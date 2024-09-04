@@ -5,12 +5,16 @@
 
   export let chain: 'base' | 'base-sepolia' = 'base-sepolia';
 
+  let errorMessage: string | null = null;
+
   // We get whatever is in the cache, and update it if needed
   // if we don't initialize it directly here, then the component will not be ready to be able
   // to scroll back to where you were if you e.g. press back in the browser
   $: chainName = chain === 'base' ? 'Base' : 'Base Sepolia';
   $: coins = getCoinOverview(chain);
-  $: fetchCoinOverview(chain).then(data => (coins = data));
+  $: fetchCoinOverview(chain)
+    .then(data => (coins = data))
+    .catch(e => (errorMessage = e.message));
   let unconfirmedData = false;
 
   $: getIcon = (coin: any) => {
@@ -37,30 +41,38 @@
         class="form-check-input me-2" /><label for="unconfirmed-data">Show unconfirmed data</label>
     </div>
   {/if}
-  <table class="table table-striped table-hover">
-    <thead>
-      <tr>
-        <th class="icon-col"></th>
-        <th class="symbol-col">Symbol</th>
-        <th class="name-col">Name</th>
-        <th class="desc-col">Description</th>
-        <th class="transact-col">Transfers <small>(last 24h)</small></th>
-      </tr>
-    </thead>
-    <tbody>
-      {#each coins as coin}
-        <tr on:click={() => goto(`/coin/${chain}/${coin.address}`)}>
-          <td class="icon-col"
-            ><img src={getIcon(coin)} alt="icon for {coin.symbol}" class="coin-icon" /></td>
-          <td class="symbol-col"
-            ><a href="/coin/{chain}/{coin.address}"><code>{coin.symbol}</code></a>
-          </td><td><a href="/coin/{chain}/{coin.address}">{coin.name}</a></td>
-          <td>{getDescription(coin)}</td>
-          <td class="transact-col">{coin.transactionCount}</td>
+  {#if coins.length === 0 && !errorMessage}
+    <div class="loader-container">
+      <div class="loader"></div>
+    </div>
+  {:else if errorMessage}
+    <p class="alert alert-danger">{errorMessage}</p>
+  {:else}
+    <table class="table table-striped table-hover">
+      <thead>
+        <tr>
+          <th class="icon-col"></th>
+          <th class="symbol-col">Symbol</th>
+          <th class="name-col">Name</th>
+          <th class="desc-col">Description</th>
+          <th class="transact-col">Transfers <small>(last 24h)</small></th>
         </tr>
-      {/each}
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+        {#each coins as coin}
+          <tr on:click={() => goto(`/coin/${chain}/${coin.address}`)}>
+            <td class="icon-col"
+              ><img src={getIcon(coin)} alt="icon for {coin.symbol}" class="coin-icon" /></td>
+            <td class="symbol-col"
+              ><a href="/coin/{chain}/{coin.address}"><code>{coin.symbol}</code></a>
+            </td><td><a href="/coin/{chain}/{coin.address}">{coin.name}</a></td>
+            <td>{getDescription(coin)}</td>
+            <td class="transact-col">{coin.transactionCount}</td>
+          </tr>
+        {/each}
+      </tbody>
+    </table>
+  {/if}
 </div>
 
 <style>
