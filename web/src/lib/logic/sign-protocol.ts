@@ -9,8 +9,8 @@ import {decodeAbiParameters, parseAbiParameters} from 'viem';
 import type {ChainString} from './onchain-data';
 import type {CoinData} from './types';
 
-const schemaId = '0x16f';
-const fullSchemaId = 'onchain_evm_84532_0x16f';
+const schemaId = '0x1a5';
+const fullSchemaId = 'onchain_evm_84532_0x1a5';
 
 const client = new SignProtocolClient(SpMode.OnChain, {
   chain: EvmChains.baseSepolia
