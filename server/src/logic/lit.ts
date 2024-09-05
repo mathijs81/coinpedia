@@ -24,7 +24,7 @@ const signer = new ethers.Wallet(
   new ethers.JsonRpcProvider(LIT_RPC.CHRONICLE_YELLOWSTONE)
 );
 
-export async function runTask() {
+export async function runTask(coinAddress: string) {
   const sessionSigs = await litNodeClient.getSessionSigs({
     chain: 'ethereum',
     expiration: new Date(Date.now() + 1000 * 60 * 60 * 24).toISOString(), // 24 hours
@@ -51,11 +51,12 @@ export async function runTask() {
     },
   });
 
-  const address = '0x6f811f153a2e899f41fc916aa39d67de67c9d77c';
+  const address = coinAddress.toLowerCase();
 
   // We created a PKP key on lit:
   // That key is whitelisted in the Sign Protocol hook so it's allowed to directly attest new coin metadata
-  const pkpPublicKey = '0x04a9594f86e1118ee48a117dd0add16599a076f6f0f012f1cfac3875aa4bbe35dfcceb47bf9cb1744b6409adf865b6cd4955c6ac6a1c9c4a3909a47b27d7149468';
+  const pkpPublicKey =
+    '0x04a9594f86e1118ee48a117dd0add16599a076f6f0f012f1cfac3875aa4bbe35dfcceb47bf9cb1744b6409adf865b6cd4955c6ac6a1c9c4a3909a47b27d7149468';
   const pkpAddress = '0x7eD91D43554C4dd13D4A035624a273Ca15ff6d76';
   const rpcAddress = 'https://sepolia.base.org';
 
@@ -75,28 +76,27 @@ return '';
 }
 
   const address = '${address}';
-//   const url = 'https://ape.store/api/token/base/' + address;
-//   console.log('fetching ape data from', url);
-//   const response = await Lit.Actions.runOnce({ waitForResponse: true, name: 'apeData' }, async () => {
-//     const res = await fetch(url, {
-//       headers: {
-//         'User-Agent':
-//           'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:129.0) Gecko/20100101 Firefox/129.0',
-//         Accept:
-//           'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/png,image/svg+xml,*/*;q=0.8',
-//         'Accept-Language': 'en-US,en;q=0.5',
-//         'Upgrade-Insecure-Requests': '1',
-//         'Sec-Fetch-Dest': 'document',
-//         'Sec-Fetch-Mode': 'navigate',
-//         'Sec-Fetch-Site': 'none',
-//         'Sec-Fetch-User': '?1',
-//         Priority: 'u=0, i',
-//       },
-//       method: 'GET',
-//     });
-//     return JSON.stringify(await res.json());
-//   });
-const response = \`{"token":{"id":58509,"chain":8453,"router":4,"hidden":false,"creator":"0x642246b6AE10273581Efd957CF9bC7caF03e6330","createDate":"2024-08-18T15:59:28.007942","deployDate":"2024-08-18T15:59:44.099241","kingDate":"2024-08-22T21:11:48","launchDate":null,"address":"0x6f811f153a2e899f41fc916aa39d67de67c9d77c","pairAddress":null,"name":"Pathological Pork","symbol":"PTH","description":"Pathological Pork (PTH) redefines conventional crypto approaches through its unique blend of memecoin culture with a self-sustaining, token-driven content creation ecosystem. By empowering creators to produce high-quality digital experiences, we drive community growth and charitable initiatives.","twitter":"https://x.com/PathologicalPrk","telegram":"https://t.me/PathologicalPork","website":"https://pth.media/","logo":"ipfs://QmfPudziWhQKYJtvJUxxwidHc2hriCKjxqUmWxhPpgAhYr/","referrer":null,"price":11286703178,"lastBump":"2024-09-04T16:33:20","marketCap":0,"chatCount":0,"holders":0,"isKing":false},"currentPrice":0.0000276335108062431031049915,"marketCap":27634,"virtualLiquidity":7830,"kingProgress":100,"apeProgress":40,"hasMap":true}\`;
+  const url = 'https://ape.store/api/token/base/' + address;
+  console.log('fetching ape data from', url);
+  const response = await Lit.Actions.runOnce({ waitForResponse: true, name: 'apeData' }, async () => {
+    const res = await fetch(url, {
+      headers: {
+        'User-Agent':
+          'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:129.0) Gecko/20100101 Firefox/129.0',
+        Accept:
+          'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/png,image/svg+xml,*/*;q=0.8',
+        'Accept-Language': 'en-US,en;q=0.5',
+        'Upgrade-Insecure-Requests': '1',
+        'Sec-Fetch-Dest': 'document',
+        'Sec-Fetch-Mode': 'navigate',
+        'Sec-Fetch-Site': 'none',
+        'Sec-Fetch-User': '?1',
+        Priority: 'u=0, i',
+      },
+      method: 'GET',
+    });
+    return JSON.stringify(await res.json());
+  });
 
   // Extract the metadata
   const data = JSON.parse(response);

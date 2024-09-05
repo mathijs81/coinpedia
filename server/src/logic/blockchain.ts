@@ -10,7 +10,7 @@ interface CoinData {
   name: string;
 }
 
-export async function queryOnchainCoindata(
+async function queryOnchainCoindata(
   chainSetting: ChainSetting,
   address: string
 ): Promise<CoinData> {

@@ -1,87 +1,76 @@
-import { BlockField, LogField, Query } from '@envio-dev/hypersync-client';
 import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
-import memoizee from 'memoizee';
-import { encodeEventTopics, erc20Abi } from 'viem';
-import { getCoin, getLatestBlock } from '../logic/blockchain';
 import { chains, ChainSetting } from '../constants';
 import { fetchApeData } from '../logic/ape-store';
+import { getCoin } from '../logic/blockchain';
+import { getTopTransferredCoins } from '../logic/hypersync';
+import { getAttestedData } from '../logic/sign-protocol';
+import { baseSepolia } from 'viem/chains';
 
-interface Coin {
-  address: `0x${string}`;
-  symbol: string;
-  name: string;
-  transactionCount: number;
+function getFetchers(chainSetting: ChainSetting) {
+  return [
+    async (address: string) => await getCoin(chainSetting, address),
+    async (address: string) =>
+      chainSetting.hasApeStore ? { apestore: await fetchApeData(address) } : {},
+    async (address: string) => await getAttestedData(chainSetting, address),
+  ];
 }
 
-async function queryCoins24h(chainSetting: ChainSetting) {
-  console.log('querying coins!');
-  const lastBlock = await getLatestBlock(chainSetting);
-  // block time is 2 seconds, so just count back 24 hours worth of blocks
-  const startBlock = lastBlock - BigInt((24 * 60 * 60) / 2);
+async function getCoinData(chainSetting: ChainSetting, address: string) {
+  const fetchers = getFetchers(chainSetting);
+  const resultsArray = await Promise.all(fetchers.map((fetcher) => fetcher(address)));
+  return Object.assign({}, ...resultsArray);
+}
 
-  const transferTopics = encodeEventTopics({
-    abi: erc20Abi,
-    eventName: 'Transfer',
+async function getTopCoins(chainSetting: ChainSetting) {
+  let topCoins = await getTopTransferredCoins(chainSetting);
+  if (chainSetting.chain === baseSepolia) {
+    // Add two of our test coins at the start
+    topCoins = [...topCoins];
+    topCoins.unshift({
+      address: '0xAf13556e566B33912618bf8EB21FAE184A0eb2E2',
+      transactionCount: 13371337,
+    });
+  }
+
+  // get the data that we need for each coin
+  const fetchers = getFetchers(chainSetting);
+
+  const promises = topCoins.map(async (coin) => {
+    const resultsArray = await Promise.all(
+      fetchers.map((fetcher) => {
+        try {
+          return fetcher(coin.address);
+        } catch (e) {
+          console.error(e);
+          return {};
+        }
+      })
+    );
+    return {
+      ...coin,
+      ...Object.assign({}, ...resultsArray),
+    };
   });
-
-  const query: Query = {
-    fromBlock: Number(startBlock),
-    logs: [
-      {
-        topics: [transferTopics as string[]],
-      },
-    ],
-    fieldSelection: {
-      block: [BlockField.Timestamp],
-      log: [LogField.Address],
-    },
-  };
-  const res = await chainSetting.hypersyncClient.get(query);
-  const logs = res.data.logs;
-  const addresses = logs.map((log) => log.address!);
-  // Create map of address -> count
-  const addressCount = new Map<string, number>();
-  for (const address of addresses) {
-    addressCount.set(address, (addressCount.get(address) || 0) + 1);
-  }
-  // create top 100 counts
-  const top100 = Array.from(addressCount.entries())
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 100);
-
-  async function apedata(address: string) {
-    if (!chainSetting.hasApeStore) {
-      return {};
-    }
-    try {
-      return (await fetchApeData(address)) ?? {};
-    } catch (e) {
-      console.error(e);
-      return {};
-    }
-  }
-
-  const promises = top100.map(
-    async ([address, transactionCount]) =>
-      ({
-        address,
-        transactionCount,
-        ...(await getCoin(chainSetting, address)),
-        apestore: await apedata(address),
-      }) as Coin
-  );
   return await Promise.all(promises);
 }
-
-const getCoins = memoizee(queryCoins24h, { maxAge: 5 * 60 * 1000, promise: true });
 
 export default async function coinController(fastify: FastifyInstance) {
   for (const [name, chainSetting] of Object.entries(chains)) {
     fastify.get('/' + name, async function (_request: FastifyRequest, reply: FastifyReply) {
       reply.header('Access-Control-Allow-Origin', '*');
       reply.header('Access-Control-Allow-Methods', 'GET');
-      const coins = await getCoins(chainSetting);
+      const coins = await getTopCoins(chainSetting);
       reply.send(coins);
     });
+
+    fastify.get(
+      '/' + name + '/:address',
+      async function (request: FastifyRequest, reply: FastifyReply) {
+        reply.header('Access-Control-Allow-Origin', '*');
+        reply.header('Access-Control-Allow-Methods', 'GET');
+        const { address } = request.params as any;
+        reply.send(await getCoinData(chainSetting, (address as string).toLowerCase()));
+      }
+    );
   }
 }
