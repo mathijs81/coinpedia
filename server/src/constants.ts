@@ -15,7 +15,7 @@ const baseSepoliaSetting: ChainSetting = {
   chain: baseSepolia,
   client: createPublicClient({
     chain: baseSepolia,
-    transport: http(),
+    transport: http(process.env.BASE_SEPOLIA_RPC_URL),
   }) as PublicClient,
   prefix: 'base-sep/',
   hypersyncClient: HypersyncClient.new({ url: 'https://base-sepolia.hypersync.xyz' }),
@@ -37,3 +37,8 @@ export const chains = {
   'base-sepolia': baseSepoliaSetting,
   base: baseSetting,
 };
+
+// see https://docs.sign.global/for-builders/index-1/index/address-book
+export const signProtocolAddress = '0x4e4af2a21ebf62850fD99Eb6253E1eFBb56098cD';
+export const schemaId = 421; // 0x1a5
+export const schemaIdHex = '0x1a5';

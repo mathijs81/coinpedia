@@ -8,6 +8,7 @@ import {
   LitAbility,
   LitActionResource,
 } from '@lit-protocol/auth-helpers';
+import { schemaId, signProtocolAddress } from '../constants';
 
 const litNodeClient = new LitNodeClient({
   litNetwork: LitNetwork.DatilDev,
@@ -59,10 +60,6 @@ export async function runTask(coinAddress: string) {
     '0x04a9594f86e1118ee48a117dd0add16599a076f6f0f012f1cfac3875aa4bbe35dfcceb47bf9cb1744b6409adf865b6cd4955c6ac6a1c9c4a3909a47b27d7149468';
   const pkpAddress = '0x7eD91D43554C4dd13D4A035624a273Ca15ff6d76';
   const rpcAddress = 'https://sepolia.base.org';
-
-  // see https://docs.sign.global/for-builders/index-1/index/address-book
-  const signProtocolAddress = '0x4e4af2a21ebf62850fD99Eb6253E1eFBb56098cD';
-  const schemaId = 421; // 0x1a5
 
   const litActionCode = `(async () => {
 function getTokenUrl(url) {
