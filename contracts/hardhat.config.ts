@@ -8,11 +8,13 @@ import example from "./tasks/example";
 import deploy_token from "./tasks/deploy_token";
 import deploy_hook from "./tasks/deploy_hook";
 import add_whitelisted_address from "./tasks/add_whitelisted_address";
+import deploy_user_attester from "./tasks/deploy_user_attester";
 
 task("example", "Example task").setAction(example);
 task("deploy_token", "Deploy token").setAction(deploy_token);
 task("deploy_hook", "Deploy hook").setAction(deploy_hook);
 task("add_whitelisted_address").addParam("hook").addParam("whitelisted").setAction(add_whitelisted_address);
+task("deploy_user_attester", "Deploy user attester").setAction(deploy_user_attester);
 
 const config = {
   solidity: {
