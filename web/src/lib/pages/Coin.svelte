@@ -154,10 +154,10 @@
       {/if}
     {/await}
 
-    {#if apeStoreData.description}
+    {#if Object.keys(apeStoreData).length > 0}
       <h3>Ape.Store</h3>
       <div>
-        This is a coin that's created ape.store. Coinpedia can import / refresh the metadata from
+        This is a coin that's created on ape.store. Coinpedia can import / refresh the metadata from
         their feed.
       </div>
       <b>Preview</b>

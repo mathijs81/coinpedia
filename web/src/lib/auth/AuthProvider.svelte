@@ -15,10 +15,16 @@
 
   const chains = Object.keys(chainsMetadata).map(key => {
     const chain = chainsMetadata[key as Chains];
+    const extra: Record<string, string> = {};
+    if (chain.blockExplorers?.default?.url) {
+      extra['blockExplorerUrl'] = chain.blockExplorers.default.url;
+    }
     return {
       id: key,
       label: chain.name,
-      rpcUrl: chain.rpcUrls.default.http[0]
+      rpcUrl: chain.rpcUrls.default.http[0],
+      token: 'ETH',
+      ...extra
     };
   });
 
