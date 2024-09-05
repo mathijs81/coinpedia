@@ -7,7 +7,7 @@ import {
 } from '@ethsign/sp-sdk';
 import {decodeAbiParameters, parseAbiParameters} from 'viem';
 import type {ChainString} from './onchain-data';
-import type {CoinData} from './types';
+import {parseSocials, type CoinData, type FullCoinData} from './types';
 
 const schemaId = '0x1a5';
 const fullSchemaId = 'onchain_evm_84532_0x1a5';
@@ -34,28 +34,31 @@ export async function attest(coinAddress: string, data: CoinData) {
   });
 }
 
-export async function lookupData(
-  chain: ChainString,
-  coinAddress: string
-): Promise<CoinData | null> {
-  // TODO: use ChainString for sign protocol
+export async function lookup(coinAddress: string): Promise<FullCoinData[]> {
+  // TODO: different chains?
   const result = await index.queryAttestationList({
     schemaId: fullSchemaId,
     indexingValue: coinAddress,
     page: 1
   });
   const rows = result?.rows;
-  if (!rows || rows.length === 0) return null;
-  // console.log(rows);
-  // console.log(rows[rows.length-1]);
-  const decoded = decodeAbiParameters(
-    parseAbiParameters('address,string,string,string,string'),
-    rows[0].data as `0x${string}`
-  );
-  return {
-    description: decoded[1],
-    icon: decoded[2],
-    website: decoded[3],
-    socials: JSON.parse(decoded[4])
-  };
+  if (!rows) return [];
+
+  return rows.map(row => {
+    const decoded = decodeAbiParameters(
+      parseAbiParameters('string,string,string,string,string'),
+      row.data as `0x${string}`
+    );
+    return {
+      timestamp: parseFloat(row.attestTimestamp),
+      address: row.attester,
+      description: decoded[1],
+      icon: decoded[2],
+      website: decoded[3],
+      socials: parseSocials(JSON.parse(decoded[4]))
+    };
+  });
 }
+
+// console.log(rows);
+// console.log(rows[rows.length-1]);

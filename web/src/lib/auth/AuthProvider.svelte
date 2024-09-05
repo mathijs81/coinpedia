@@ -11,7 +11,7 @@
   import {chainsMetadata} from './constants';
   import {CONTEXT_KEY} from './methods';
   import {activeChain, walletClient} from './store';
-  import type {Chains} from './types';
+  import {Chains} from './types';
 
   const chains = Object.keys(chainsMetadata).map(key => {
     const chain = chainsMetadata[key as Chains];
@@ -36,6 +36,7 @@
       return;
     }
 
+    /*
     if (
       Object.keys(chainsMetadata).findIndex(key => {
         return key.toLowerCase() === walletState[0].chains[0].id.toLowerCase();
@@ -48,9 +49,13 @@
     } else {
       $activeChain = walletState[0].chains[0].id as Chains;
     }
-
+    */
+    // Currently we run everything on base sepolia, even for the base coins
+    if (walletState[0].chains[0].id.toLowerCase() != Chains.BASE_SEPOLIA.toLowerCase()) {
+      await switchChain(Chains.BASE_SEPOLIA);
+    }
     $walletClient = createWalletClient({
-      chain: chainsMetadata[$activeChain],
+      /*chainsMetadata[$activeChain], */ chain: chainsMetadata[Chains.BASE_SEPOLIA],
       transport: custom(walletState[0].provider)
     });
   }

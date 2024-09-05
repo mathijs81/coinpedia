@@ -4,6 +4,7 @@ $modal-content-color: #333;
 $primary: #059212;
 
 @import 'bootstrap/scss/bootstrap';
+@import 'bootstrap-icons/font/bootstrap-icons.css';
 
 h1,
 h2,
@@ -91,7 +92,9 @@ html {
 }
 
 @keyframes escaleY {
-  0%, 80%, 100% {
+  0%,
+  80%,
+  100% {
     box-shadow: 0 0;
     height: 4em;
   }

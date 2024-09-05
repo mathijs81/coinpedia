@@ -31,16 +31,16 @@
     <li class="nav-item">
       <a
         class="nav-link"
-        class:active={currentChain == 'base-sepolia'}
-        on:click={() => (currentChain = 'base-sepolia')}
-        href="#">Base Sepolia</a>
+        class:active={currentChain == 'base'}
+        on:click={() => (currentChain = 'base')}
+        href="#">Base</a>
     </li>
     <li class="nav-item">
       <a
         class="nav-link"
-        class:active={currentChain == 'base'}
-        on:click={() => (currentChain = 'base')}
-        href="#">Base</a>
+        class:active={currentChain == 'base-sepolia'}
+        on:click={() => (currentChain = 'base-sepolia')}
+        href="#">Base Sepolia</a>
     </li>
   </ul>
   <CoinOverview chain={currentChain} />

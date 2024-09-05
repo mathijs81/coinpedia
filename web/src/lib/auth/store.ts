@@ -3,7 +3,7 @@ import {createPublicClient, type Address, type WalletClient, http} from 'viem';
 import {Chains} from './types';
 import {chainsMetadata} from './constants';
 
-export const activeChain = writable<Chains>(Chains.BASE_SEPOLIA);
+export const activeChain = writable<Chains>(Chains.BASE);
 export const walletClient = writable<WalletClient | undefined>();
 
 export const walletAccount = derived<
@@ -17,7 +17,6 @@ export const walletAccount = derived<
 
   $walletClient?.requestAddresses().then(accounts => {
     const [account] = accounts;
-
     set(account);
   });
 });

@@ -11,6 +11,25 @@ const cache: Record<string, CacheEntry> = {};
 const refetchInterval = 5 * 60 * 1000;
 const expireInterval = 30 * 60 * 1000;
 
+export async function apeStoreImport(address: string) {
+  const response = await fetch(
+    'https://coins.vogelcode.com/api/v1/submit?address=' + address,
+    {method: 'POST'}
+  );
+  return await response.json();
+}
+
+export async function fetchCoinData(chain: ChainString, address: string) {
+  const response = await fetch(
+    'https://coins.vogelcode.com/api/v1/coin/' + chain + '/' + address
+  );
+  const coin = await response.json();
+  if (coin.error) {
+    throw new Error(coin.error);
+  }
+  return coin;
+}
+
 async function fetchData(chain: ChainString) {
   const response = await fetch(
     'https://coins.vogelcode.com/api/v1/coin/' + chain

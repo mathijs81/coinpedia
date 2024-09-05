@@ -1,10 +1,9 @@
 <script lang="ts">
   import Logo from '../../assets/logo.svg';
 
-  import {chainsMetadata} from '$lib/auth/constants';
   import {useAuth} from '$lib/auth/methods';
-  import {accountENS, walletAccount, activeChain} from '$lib/auth/store';
-  import {Chains} from '$lib/auth/types';
+  import {walletAccount} from '$lib/auth/store';
+  import {formatAddress} from '$lib/util/formatting';
 
   const {connect, disconnect, switchChain} = useAuth();
 </script>
@@ -25,8 +24,8 @@
           </a>
         </div>
       </div>
-      <div class="col">
-        {#if $walletAccount}{$walletAccount}<button
+      <div class="col text-end">
+        {#if $walletAccount}{formatAddress($walletAccount)}<button
             class="btn btn-primary ms-2"
             on:click={() => disconnect()}>Disconnect</button>
         {:else}

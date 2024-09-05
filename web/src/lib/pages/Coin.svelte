@@ -3,46 +3,110 @@
   import {activeChain} from '$lib/auth/store';
   import {fromString} from '$lib/auth/types';
   import {getOnchain, toChainString} from '$lib/logic/onchain-data';
-  import {attest, lookupData} from '$lib/logic/sign-protocol';
-  import type {CoinData} from '$lib/logic/types';
+  import {attest, lookup} from '$lib/logic/sign-protocol';
+  import {formatAddress} from '$lib/util/formatting';
+  import {walletAccount} from '$lib/auth/store';
+  import {useAuth} from '$lib/auth/methods';
+  import {getIconName, SocialNetwork, type CoinData} from '$lib/logic/types';
+  import {apeStoreImport, fetchCoinData} from '$lib/logic/server-data';
+
+  const {connect} = useAuth();
+
   let chain = toChainString($page.params.chain);
   activeChain.set(fromString(chain));
   let address = $page.params.address as `0x${string}`;
   const onChainData = getOnchain(chain, address);
-  const currentData = lookupData(chain, address);
+  const attestations = lookup(address);
+
+  let apeStoreData: CoinData = {} as CoinData;
+
+  const serverData = fetchCoinData(chain, address).then(coin => {
+    if (coin) {
+      if (coin.apestore) {
+        apeStoreData = coin.apestore;
+      }
+    }
+  });
 
   let description = '';
   let website = '';
   let iconUrl = '';
   let errorMessage = '';
 
-  currentData.then(data => {
-    if (data) {
+  let xUrl = '';
+  let discordUrl = '';
+  let telegramUrl = '';
+
+  const currentData = attestations.then(attestations => {
+    if (attestations.length > 0) {
+      const data = attestations[0];
       description = data.description;
       website = data.website;
       iconUrl = data.icon;
+
+      data.socials.forEach(social => {
+        console.log('social: ', social);
+        if (social.type === SocialNetwork.X) {
+          xUrl = social.url;
+        } else if (social.type === SocialNetwork.DISCORD) {
+          discordUrl = social.url;
+        } else if (social.type === SocialNetwork.TELEGRAM) {
+          telegramUrl = social.url;
+        }
+      });
+      return data;
     }
+    return null;
   });
 
   const handleSubmit = async () => {
     errorMessage = '';
     try {
+      const socialArray = [];
+      if (xUrl) {
+        socialArray.push({type: SocialNetwork.X, url: xUrl});
+      }
+      if (discordUrl) {
+        socialArray.push({type: SocialNetwork.DISCORD, url: discordUrl});
+      }
+      if (telegramUrl) {
+        socialArray.push({type: SocialNetwork.TELEGRAM, url: telegramUrl});
+      }
+
       await attest(address, {
         description,
         website,
         icon: iconUrl,
-        socials: []
+        socials: socialArray
       });
     } catch (e) {
       if (e instanceof Error) {
-        console.error(e);
         errorMessage = e.message;
         if (errorMessage.includes(`Unable to decode signature "0x87aee992"`)) {
           errorMessage = 'There was an error submitting. Are you the coin owner?';
+        } else {
+          console.error(e);
         }
       } else {
         console.log(e);
         errorMessage = 'There was an error submitting. Are you the coin owner?';
+      }
+    }
+  };
+
+  let importResult = '';
+  let loadingImport = false;
+
+  const handleImport = async () => {
+    loadingImport = true;
+    // The server will trigger a lit action that fetches the data and attests it on sign protocol
+    try {
+      importResult = JSON.stringify(await apeStoreImport(address), null, 2);
+    } catch (e) {
+      if (e instanceof Error) {
+        importResult = e.message;
+      } else {
+        importResult = 'ERROR:\n' + JSON.stringify(e, null, 2);
       }
     }
   };
@@ -52,66 +116,163 @@
   {#await onChainData}
     <p>loading...</p>
   {:then data}
-    <h3>{data.name} <code>({data.symbol})</code></h3>
     {#if data.isOwnable && data.owner !== '0x0000000000000000000000000000000000000000'}
-      <p>This coin is owned by {data.owner}.</p>
+      <p class="float-end">Owned by {formatAddress(data.owner)}.</p>
     {:else}
-      <p>This coin has no owner.</p>
+      <p class="float-end">No owner.</p>
     {/if}
     {#await currentData then current}
       {#if current}
-        <h4>Current data</h4>
+        <h3>
+          <img src={current.icon} alt="icon" class="icon me-2" />
+          {data.name} <code>({data.symbol})</code>
+        </h3>
+
+        <div class="d-flex gap-2 justify-content-center">
+          <div>
+            <a href={current.website} target="_blank"
+              ><i class="bi bi-globe fs-3 p-3" title={current.website}></i></a>
+          </div>
+          {#if current.socials}
+            {#each current.socials as social}
+              <div>
+                <a href={social.url} target="_blank"
+                  ><i class="bi {getIconName(social.type)} fs-3 p-3" title={social.url}></i></a>
+              </div>
+            {/each}
+          {/if}
+        </div>
         <b>Description</b>
         <p>{current.description}</p>
-        <b>Website</b>
-        <p><a href={current.website} target="_blank">{current.website}</a></p>
-        <b>Icon</b>
-        <p><img src={current.icon} alt="icon" /><br /><small>{current.icon}</small></p>
+        <b>Blockchain address</b>
+        <p>{address}</p>
+      {:else}
+        <h3>{data.name} <code>({data.symbol})</code></h3>
+        <b>Blockchain address</b>
+        <p>{address}</p>
+        <p>{data.symbol} has no submitted metadata yet</p>
       {/if}
     {/await}
 
-    <form on:submit|preventDefault={handleSubmit} class="needs-validation" novalidate>
-      <div class="mb-3">
-        <label for="description" class="form-label">Description</label>
-        <textarea
-          id="description"
-          bind:value={description}
-          class="form-control"
-          placeholder="Enter a description of the token"
-          required></textarea>
-        <div class="invalid-feedback">Please provide a description.</div>
+    {#if apeStoreData.description}
+      <h3>Ape.Store</h3>
+      <div>
+        This is a coin that's created ape.store. Coinpedia can import / refresh the metadata from
+        their feed.
       </div>
-
-      <div class="mb-3">
-        <label for="website" class="form-label">Website URL</label>
-        <input
-          type="url"
-          id="website"
-          bind:value={website}
-          class="form-control"
-          placeholder="Enter the official website URL"
-          required />
-        <div class="invalid-feedback">Please provide a valid website URL.</div>
+      <b>Preview</b>
+      <div>
+        <img src={apeStoreData.icon} alt="icon" class="icon me-2" /><br />
+        {#if apeStoreData.website}
+          <a href={apeStoreData.website}>{apeStoreData.website}</a><br />
+        {/if}
+        {apeStoreData.description}
       </div>
-
-      <div class="mb-3">
-        <label for="iconUrl" class="form-label">Icon URL</label>
-        <input
-          type="url"
-          id="iconUrl"
-          bind:value={iconUrl}
-          class="form-control"
-          placeholder="Enter the URL for the token icon"
-          required />
-        <div class="invalid-feedback">Please provide a valid URL for the icon.</div>
-      </div>
-
-      <button type="submit" class="btn btn-primary">Submit</button>
-      {#if errorMessage}
-        <div class="alert alert-danger mt-3">{errorMessage}</div>
+      {#if importResult}
+        <div>Server response:</div>
+        <code>{importResult}</code>
+      {:else}
+        <button class="btn btn-primary" on:click={handleImport}>Import from ape.store</button>
       {/if}
-    </form>
+    {/if}
+
+    <h3 class="mt-3">Submit update</h3>
+    {#if !$walletAccount}
+      <button class="btn btn-primary" on:click={() => connect()}>Connect wallet</button>
+    {:else}
+      <form on:submit|preventDefault={handleSubmit} class="needs-validation" novalidate>
+        <div class="mb-3">
+          <label for="description" class="form-label">Description</label>
+          <textarea
+            id="description"
+            bind:value={description}
+            class="form-control"
+            placeholder="Enter a description of the token"
+            required></textarea>
+          <div class="invalid-feedback">Please provide a description.</div>
+        </div>
+
+        <div class="mb-3">
+          <label for="website" class="form-label">Website URL</label>
+          <div class="input-group">
+            <span class="input-group-text"><i class="bi bi-globe"></i></span>
+            <input
+              type="url"
+              id="website"
+              bind:value={website}
+              class="form-control"
+              placeholder="Enter the official website URL"
+              required />
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="iconUrl" class="form-label">Icon URL</label>
+          <div class="input-group">
+            <span class="input-group-text"><i class="bi bi-image"></i></span>
+            <input
+              type="url"
+              id="iconUrl"
+              bind:value={iconUrl}
+              class="form-control"
+              placeholder="Enter the URL for the icon of the token (ideally 256x256px or larger)"
+              required />
+          </div>
+        </div>
+
+        <b>Social channels</b>
+        <div class="input-group mb-2">
+          <span class="input-group-text"><i class="bi bi-twitter-x"></i></span>
+          <input
+            type="url"
+            id="xUrl"
+            bind:value={xUrl}
+            class="form-control"
+            placeholder="X profile URL" />
+        </div>
+        <div class="input-group mb-2">
+          <span class="input-group-text"><i class="bi bi-telegram"></i></span>
+          <input
+            type="url"
+            id="telegramUrl"
+            bind:value={telegramUrl}
+            class="form-control"
+            placeholder="Telegram URL" />
+        </div>
+        <div class="input-group mb-2">
+          <span class="input-group-text"><i class="bi bi-discord"></i></span>
+          <input
+            type="url"
+            id="discordUrl"
+            bind:value={discordUrl}
+            class="form-control"
+            placeholder="Discord URL" />
+        </div>
+
+        <button type="submit" class="btn btn-primary">Submit</button>
+        {#if errorMessage}
+          <div class="alert alert-danger mt-3">{errorMessage}</div>
+        {/if}
+      </form>
+    {/if}
+    {#await attestations then history}
+      {#if history && history.length > 0}
+        <h3 class="mt-4">History</h3>
+        {#each history as attest}
+          <div class="row">
+            {attest.timestamp} -- attested by {attest.address}
+          </div>
+        {/each}
+      {/if}
+    {/await}
   {:catch error}
     <p>{error.message}</p>
   {/await}
 </div>
+
+<style lang="scss">
+  .icon {
+    max-width: 96px;
+    max-height: 96px;
+  }
+</style>

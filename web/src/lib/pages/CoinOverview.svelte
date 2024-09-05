@@ -1,6 +1,6 @@
 <script lang="ts">
   import {goto} from '$app/navigation';
-  import {fetchCoinOverview, getCoinOverview} from '$lib/logic/coin-overview-data';
+  import {fetchCoinOverview, getCoinOverview} from '$lib/logic/server-data';
   import UnknownIcon from '../../assets/unknown-coin.svg';
 
   export let chain: 'base' | 'base-sepolia' = 'base-sepolia';
@@ -30,8 +30,8 @@
   };
 </script>
 
-<div>
-  <h3>Top coins on {chainName}</h3>
+<div class="card">
+  <h3 class="p-2">Top coins on {chainName}</h3>
   {#if chain == 'base'}
     <div class="sticky-top bg-light p-2">
       <input
@@ -65,7 +65,7 @@
               ><img src={getIcon(coin)} alt="icon for {coin.symbol}" class="coin-icon" /></td>
             <td class="symbol-col"
               ><a href="/coin/{chain}/{coin.address}"><code>{coin.symbol}</code></a>
-            </td><td><a href="/coin/{chain}/{coin.address}">{coin.name}</a></td>
+            </td><td class="name-col"><a href="/coin/{chain}/{coin.address}">{coin.name}</a></td>
             <td>{getDescription(coin)}</td>
             <td class="transact-col">{coin.transactionCount}</td>
           </tr>
@@ -87,6 +87,8 @@
   }
   .name-col {
     width: 20ch;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .coin-icon {
