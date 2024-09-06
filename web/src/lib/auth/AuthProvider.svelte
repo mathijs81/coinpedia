@@ -10,7 +10,7 @@
   import {createWalletClient, custom} from 'viem';
   import {chainsMetadata} from './constants';
   import {CONTEXT_KEY} from './methods';
-  import {activeChain, walletClient} from './store';
+  import {walletClient} from './store';
   import {Chains} from './types';
 
   const chains = Object.keys(chainsMetadata).map(key => {

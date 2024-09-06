@@ -15,32 +15,66 @@
   $: fetchCoinOverview(chain)
     .then(data => (coins = data))
     .catch(e => (errorMessage = e.message));
-  let unconfirmedData = false;
+
+  enum DataUsed {
+    CHAIN_ONLY,
+    COINPEDIA,
+    UNCONFIRMED
+  }
+  let dataUsed: DataUsed = DataUsed.COINPEDIA;
 
   $: getIcon = (coin: any) => {
-    return coin.icon || (unconfirmedData ? coin.apestore?.icon : null) || UnknownIcon;
+    return (
+      (dataUsed !== DataUsed.CHAIN_ONLY ? coin.icon : null) ||
+      (dataUsed === DataUsed.UNCONFIRMED ? coin.apestore?.icon : null) ||
+      UnknownIcon
+    );
   };
 
   $: getDescription = (coin: any) => {
     return (
-      coin.description ||
-      (unconfirmedData ? coin.apestore?.description : null) ||
-      'No description (yet)'
+      (dataUsed !== DataUsed.CHAIN_ONLY ? coin.description : null) ||
+      (dataUsed === DataUsed.UNCONFIRMED ? coin.apestore?.description : null) ||
+      `${coin.name} is an ERC-20 token on ${chainName}`
     );
   };
 </script>
 
 <div class="card">
   <h3 class="p-2">Top coins on {chainName}</h3>
-  {#if chain == 'base'}
-    <div class="sticky-top bg-light p-2">
-      <input
-        type="checkbox"
-        id="unconfirmed-data"
-        bind:checked={unconfirmedData}
-        class="form-check-input me-2" /><label for="unconfirmed-data">Show unconfirmed data</label>
+  <div class="sticky-top bg-light p-2">
+    Show
+    <div class="row">
+      <div class="col">
+        <input
+          type="radio"
+          id="chain-only"
+          bind:group={dataUsed}
+          value={DataUsed.CHAIN_ONLY}
+          class="form-check-input me-2" /><label for="chain-only">Only ERC-20 data</label>
+      </div>
+      <div class="col">
+        <input
+          type="radio"
+          id="coinpedia-data"
+          bind:group={dataUsed}
+          value={DataUsed.COINPEDIA}
+          class="form-check-input me-2" /><label for="coinpedia-data"
+          >ERC-20 & attested Coinpedia data</label>
+      </div>
+      {#if chain == 'base'}
+        <div class="col">
+          <input
+            type="radio"
+            id="unconfirmed-data"
+            bind:group={dataUsed}
+            value={DataUsed.UNCONFIRMED}
+            class="form-check-input me-2" /><label for="unconfirmed-data"
+            >ERC-20, Coinpedia & unconfirmed data</label>
+        </div>
+      {/if}
     </div>
-  {/if}
+  </div>
   {#if coins.length === 0 && !errorMessage}
     <div class="loader-container">
       <div class="loader"></div>

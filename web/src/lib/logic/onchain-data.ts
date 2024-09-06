@@ -1,6 +1,15 @@
 import {get} from 'svelte/store';
 import {publicClient} from '../auth/store';
-import {erc20Abi, getContract, parseAbi} from 'viem';
+import {
+  createPublicClient,
+  erc20Abi,
+  getAddress,
+  getContract,
+  http,
+  parseAbi
+} from 'viem';
+import {baseSepolia} from 'viem/chains';
+import {hookAddress, userAttesterContract} from './constants';
 
 interface OnChainData {
   symbol: string;
@@ -49,4 +58,71 @@ export type ChainString = 'base' | 'base-sepolia';
 export function toChainString(chain: string | null): ChainString {
   if (chain === 'base') return 'base';
   return 'base-sepolia';
+}
+
+const sepoliaClient = createPublicClient({
+  chain: baseSepolia,
+  transport: http()
+});
+
+const partialHookAbi = [
+  {
+    inputs: [],
+    name: 'owner',
+    outputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address'
+      }
+    ],
+    stateMutability: 'view',
+    type: 'function'
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'attester',
+        type: 'address'
+      }
+    ],
+    name: 'whitelist',
+    outputs: [
+      {
+        internalType: 'bool',
+        name: 'allowed',
+        type: 'bool'
+      }
+    ],
+    stateMutability: 'view',
+    type: 'function'
+  }
+];
+
+const owner = sepoliaClient.readContract({
+  address: hookAddress,
+  abi: partialHookAbi,
+  functionName: 'owner'
+}) as Promise<string>;
+
+export async function isWhitelisted(address: string): Promise<boolean> {
+  return (
+    addressEquals(await owner, address) ||
+    ((await sepoliaClient.readContract({
+      address: hookAddress,
+      abi: partialHookAbi,
+      functionName: 'whitelist',
+      args: [getAddress(address)]
+    })) as boolean)
+  );
+}
+
+export function addressEquals(
+  a: string | undefined,
+  b: string | undefined
+): boolean {
+  return (
+    a !== undefined && b !== undefined && a.toLowerCase() === b.toLowerCase()
+  );
 }

@@ -2,21 +2,11 @@ import {
   EvmChains,
   IndexService,
   SignProtocolClient,
-  SpMode,
-  type Attestation
+  SpMode
 } from '@ethsign/sp-sdk';
 import {decodeAbiParameters, parseAbiParameters, parseEther} from 'viem';
-import type {ChainString} from './onchain-data';
 import {parseSocials, type CoinData, type FullCoinData} from './types';
-
-const schemaId = '0x1a5';
-const fullSchemaId = 'onchain_evm_84532_0x1a5';
-
-// Kind of a giant hack, but it works:
-// we deployed a very light copy of the sign protocol ISP that just makes sure
-// to collect 0.01 ETH and forward the attestation and then the hook lets it through
-// because we whitelisted the UserAttester contract.
-const userAttesterContract = '0x3D764af37c638B8f696C5852Db41b167b98c2556';
+import {fullSchemaId, schemaId, userAttesterContract} from './constants';
 
 const client = new SignProtocolClient(SpMode.OnChain, {
   chain: EvmChains.baseSepolia
@@ -93,6 +83,3 @@ export async function lookup(coinAddress: string): Promise<FullCoinData[]> {
     };
   });
 }
-
-// console.log(rows);
-// console.log(rows[rows.length-1]);

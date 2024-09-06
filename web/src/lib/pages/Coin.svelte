@@ -1,8 +1,8 @@
 <script lang="ts">
   import {page} from '$app/stores';
-  import {activeChain} from '$lib/auth/store';
+  import {activeChain, whitelisted} from '$lib/auth/store';
   import {fromString} from '$lib/auth/types';
-  import {getOnchain, toChainString} from '$lib/logic/onchain-data';
+  import {addressEquals, getOnchain, toChainString} from '$lib/logic/onchain-data';
   import {attest, lookup} from '$lib/logic/sign-protocol';
   import {formatAddress} from '$lib/util/formatting';
   import {walletAccount} from '$lib/auth/store';
@@ -73,12 +73,18 @@
         socialArray.push({type: SocialNetwork.TELEGRAM, url: telegramUrl});
       }
 
-      await attest(address, {
-        description,
-        website,
-        icon: iconUrl,
-        socials: socialArray
-      });
+      const asUser = !submitFree;
+
+      await attest(
+        address,
+        {
+          description,
+          website,
+          icon: iconUrl,
+          socials: socialArray
+        },
+        asUser
+      );
     } catch (e) {
       if (e instanceof Error) {
         errorMessage = e.message;
@@ -110,6 +116,17 @@
       }
     }
   };
+  let isOwner = false;
+  $: onChainData.then(data => {
+    console.log($walletAccount, data?.owner);
+    isOwner = addressEquals($walletAccount, data?.owner ?? '');
+  });
+  $: submitFree = isOwner || $whitelisted;
+  $: submitExplanation = submitFree
+    ? isOwner
+      ? "You can update data for free because you're the token owner."
+      : 'Your address is whitelisted for Coinpedia updates'
+    : 'To prevent spam, updating data as non-owner costs 0.01 Ξ.';
 </script>
 
 <div>
@@ -117,7 +134,11 @@
     <p>loading...</p>
   {:then data}
     {#if data.isOwnable && data.owner !== '0x0000000000000000000000000000000000000000'}
-      <p class="float-end">Owned by {formatAddress(data.owner)}.</p>
+      <p class="float-end">
+        Owned by {formatAddress(data.owner)}{#if isOwner}<span
+            class="badge rounded-pill text-bg-success">YOU</span
+          >{/if}
+      </p>
     {:else}
       <p class="float-end">No owner.</p>
     {/if}
@@ -150,7 +171,7 @@
         <h3>{data.name} <code>({data.symbol})</code></h3>
         <b>Blockchain address</b>
         <p>{address}</p>
-        <p>{data.symbol} has no submitted metadata yet</p>
+        <p>{data.symbol} has no attested metadata yet</p>
       {/if}
     {/await}
 
@@ -237,7 +258,7 @@
             id="telegramUrl"
             bind:value={telegramUrl}
             class="form-control"
-            placeholder="Telegram URL" />
+            placeholder="Telegram URL" />Ξ
         </div>
         <div class="input-group mb-2">
           <span class="input-group-text"><i class="bi bi-discord"></i></span>
@@ -249,7 +270,9 @@
             placeholder="Discord URL" />
         </div>
 
-        <button type="submit" class="btn btn-primary">Submit</button>
+        <p>{submitExplanation}</p>
+        <button type="submit" class="btn btn-primary"
+          >Submit{#if !submitFree}{' '}(0.01 Ξ){/if}</button>
         {#if errorMessage}
           <div class="alert alert-danger mt-3">{errorMessage}</div>
         {/if}

@@ -20,10 +20,13 @@
   </p>
   <ul>
     <li>Owners of coin contracts can always update the data directly</li>
-    <li>Data from ape.store can be fetched and updated automatically</li>
+    <li>Coins that are launched through ape.store can be triggered for an automatic update</li>
     <li>
-      If you submit other data, this will go through a vetting process. You can make this process
-      more seamless by staking some of the ERC-20 coins you're submitting data about.
+      If you're not the owner of a coin, you can still update the metadata. To prevent spam, you
+      have to pay 0.01 ETH for an update.<br />
+      Future iterations may apply a vetting process, where user submissions may be reviewed by others
+      before being accepted and the fee may be waived if you temporarily stake some Coinpedia governance
+      tokens or the ERC-20 token of the coin you're updating.
     </li>
   </ul>
 

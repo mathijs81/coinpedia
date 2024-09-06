@@ -2,6 +2,7 @@ import {derived, writable, type Readable} from 'svelte/store';
 import {createPublicClient, type Address, type WalletClient, http} from 'viem';
 import {Chains} from './types';
 import {chainsMetadata} from './constants';
+import {isWhitelisted} from '$lib/logic/onchain-data';
 
 export const activeChain = writable<Chains>(Chains.BASE);
 export const walletClient = writable<WalletClient | undefined>();
@@ -38,4 +39,10 @@ export const accountENS = derived([walletAccount], ([$walletAccount], set) => {
   });
 
   ethPublicClient.getEnsName({address: $walletAccount}).then(ens => set(ens));
+});
+
+export const whitelisted = derived([walletAccount], ([$walletAccount], set) => {
+  set(false);
+  if (!$walletAccount) return;
+  isWhitelisted($walletAccount).then(set);
 });
