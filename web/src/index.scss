@@ -1,7 +1,25 @@
 $font-family-sans-serif: 'Rubik', Arial, Helvetica, sans-serif;
 $modal-content-color: #333;
-//https://colorhunt.co/palette/05921206d0019bec00f3ff90
-$primary: #059212;
+
+// https://colorhunt.co/palette/00712dd5ed9ffffbe6ff9100
+// based on https://huemint.com/bootstrap-basic/#palette=fffbe6-ffffff-000673-00712d-ff9100-d92f23 and modified further
+$white: #ffffff;
+
+$theme-colors: (
+  'light': #fffdf5,
+  'dark': #000673,
+  'primary': #004471,
+  'secondary': #ff9100,
+  'info': #d92f23,
+  'success': #00b01b,
+  'warning': #f9c600,
+  'danger': #f70049
+);
+
+$body-bg: #fffdf5;
+$primary: #004471;
+$border-color: #d8d1b6;
+$card-border-color: $border-color;
 
 @import 'bootstrap/scss/bootstrap';
 @import 'bootstrap-icons/font/bootstrap-icons.css';
@@ -12,18 +30,14 @@ h3,
 h4,
 h5,
 h6 {
-  font-family: 'Lilita One', sans-serif;
-}
-
-body {
-  background: rgb(255, 251, 244);
+  font-family: 'Russo One', sans-serif;
 }
 
 .top-header {
   background: linear-gradient(
     45deg,
     darken($primary, 5%),
-    darken($primary, 20%)
+    darken($primary, 10%)
   );
   border-bottom: 1px solid #e9ecef;
   color: white;
