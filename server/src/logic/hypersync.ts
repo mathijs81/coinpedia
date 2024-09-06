@@ -2,8 +2,7 @@ import { BlockField, LogField, Query } from '@envio-dev/hypersync-client';
 import memoizee from 'memoizee';
 import { encodeEventTopics, erc20Abi } from 'viem';
 import { ChainSetting } from '../constants';
-import { fetchApeData } from '../logic/ape-store';
-import { getCoin, getLatestBlock } from '../logic/blockchain';
+import { getLatestBlock } from '../logic/blockchain';
 
 export interface HypersyncData {
   address: `0x${string}`;
