@@ -40,6 +40,6 @@ export const chains = {
 
 // see https://docs.sign.global/for-builders/index-1/index/address-book
 export const signProtocolAddress = '0x4e4af2a21ebf62850fD99Eb6253E1eFBb56098cD';
-export const schemaId = 421; // 0x1a5
-export const schemaIdHex = '0x1a5';
-export const fullSchemaId = 'onchain_evm_84532_0x1a5';
+export const schemaId = 554; // 0x22a
+export const schemaIdHex = '0x22a';
+export const fullSchemaId = 'onchain_evm_84532_' + schemaIdHex;

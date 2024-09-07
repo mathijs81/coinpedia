@@ -1,15 +1,8 @@
-import {
-  EvmChains,
-  IndexService,
-  SignProtocolClient,
-  SpMode,
-  type Attestation,
-} from '@ethsign/sp-sdk';
+import { EvmChains, IndexService, SignProtocolClient, SpMode } from '@ethsign/sp-sdk';
 import { decodeAbiParameters, parseAbiParameters, WalletClient } from 'viem';
-import type { CoinData } from './types';
-import { signCache } from './cache';
 import { chains, ChainSetting, fullSchemaId } from '../constants';
-import { baseSepolia } from 'viem/chains';
+import { signCache } from './cache';
+import type { CoinData } from './types';
 
 const client = new SignProtocolClient(SpMode.OnChain, {
   chain: EvmChains.baseSepolia,
@@ -19,14 +12,14 @@ const client = new SignProtocolClient(SpMode.OnChain, {
 const index = new IndexService('testnet');
 
 export async function lookupAttestation(id: string) {
-    return await client.getAttestation(id);
+  return await client.getAttestation(id);
 }
 
 async function lookup(coinAddress: string): Promise<CoinData | null> {
   // TODO: different chains?
   const result = await index.queryAttestationList({
     schemaId: fullSchemaId,
-    indexingValue: coinAddress,
+    indexingValue: coinAddress.toLowerCase(),
     page: 1,
   });
   const rows = result?.rows;
@@ -34,7 +27,7 @@ async function lookup(coinAddress: string): Promise<CoinData | null> {
   // console.log(rows);
   // console.log(rows[rows.length-1]);
   const decoded = decodeAbiParameters(
-    parseAbiParameters('string,string,string,string,string'),
+    parseAbiParameters('address,string,string,string,string'),
     rows[0].data as `0x${string}`
   );
   return {
@@ -63,6 +56,6 @@ export async function getAttestedData(
 }
 
 export async function clearCache(coinAddress: string) {
-    signCache.delete(chains['base-sepolia'].prefix + coinAddress.toLowerCase());
-    signCache.delete(chains['base'].prefix + coinAddress.toLowerCase());
+  signCache.delete(chains['base-sepolia'].prefix + coinAddress.toLowerCase());
+  signCache.delete(chains['base'].prefix + coinAddress.toLowerCase());
 }

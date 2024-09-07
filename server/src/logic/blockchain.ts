@@ -49,10 +49,9 @@ export async function getCoin(chainSetting: ChainSetting, address: string): Prom
 }
 
 export async function startSignProtocolListener(callback: (coinAddress: string) => void) {
-
   // delay 5s for startup
-  await new Promise(resolve => setTimeout(resolve, 2000));
-  console.log("starting contract watch");
+  await new Promise((resolve) => setTimeout(resolve, 2000));
+  console.log('starting contract watch');
 
   const client = chains['base-sepolia'].client;
 
@@ -65,22 +64,21 @@ export async function startSignProtocolListener(callback: (coinAddress: string) 
     address: signProtocolAddress,
     abi,
     eventName: 'AttestationMade',
-    onLogs: async logs => {
+    onLogs: async (logs) => {
       for (const log of logs) {
         const attestationId = log.args.attestationId!;
         try {
           const attestation = await lookupAttestation(attestationId.toString());
           if (attestation.schemaId === schemaIdHex) {
-            console.log("attestation", attestation);
+            console.log('attestation', attestation);
             callback(log.args.indexingKey!);
           }
         } catch (e) {
-          console.error("Error looking up attestation for", attestationId, log, e);
+          console.error('Error looking up attestation for', attestationId, log, e);
         }
       }
     },
-    onError: error => console.error(error),
+    onError: (error) => console.error(error),
     pollingInterval: 2_000,
   });
-
 }

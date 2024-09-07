@@ -42,10 +42,10 @@
 
 <div class="card">
   <h3 class="p-2">Top coins on {chainName}</h3>
-  <div class="sticky-top bg-light p-2">
+  <div class="sticky-top bg-light px-3">
     Show
-    <div class="row">
-      <div class="col">
+    <div class="d-flex flex-row">
+      <div class="col d-flex flex-row">
         <input
           type="radio"
           id="chain-only"
@@ -53,7 +53,7 @@
           value={DataUsed.CHAIN_ONLY}
           class="form-check-input me-2" /><label for="chain-only">Only ERC-20 data</label>
       </div>
-      <div class="col">
+      <div class="col d-flex flex-row">
         <input
           type="radio"
           id="coinpedia-data"
@@ -63,7 +63,7 @@
           >ERC-20 & attested Coinpedia data</label>
       </div>
       {#if chain == 'base'}
-        <div class="col">
+        <div class="col  d-flex flex-row">
           <input
             type="radio"
             id="unconfirmed-data"
@@ -82,7 +82,7 @@
   {:else if errorMessage}
     <p class="alert alert-danger">{errorMessage}</p>
   {:else}
-    <table class="table table-striped table-hover">
+    <table class="table table-striped table-hover p-0 m-0">
       <thead>
         <tr>
           <th class="icon-col"></th>
@@ -105,9 +105,7 @@
           </tr>
         {/each}
       </tbody>
-    </table>
-  {/if}
-</div>
+    </table>{/if}</div>
 
 <style>
   table {
@@ -137,5 +135,11 @@
   .transact-col {
     text-align: right;
     width: 10ch;
+  }
+  .card {
+    overflow-x: auto;
+  }
+  .card > * {
+    min-width: 600px;
   }
 </style>

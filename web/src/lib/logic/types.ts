@@ -18,6 +18,14 @@ export interface CoinData {
 }
 
 export function parseSocials(socials: any): SocialNetworkEntry[] {
+  // sometimes the string is doubly json-ified
+  if (typeof socials === 'string') {
+    try {
+      socials = JSON.parse(socials);
+    } catch (error) {
+      console.error('Failed to parse socials', socials);
+    }
+  }
   if (Array.isArray(socials)) {
     return socials;
   }
@@ -45,6 +53,7 @@ export function getIconName(network: SocialNetwork) {
 export interface AttestationData {
   timestamp: number;
   address: string;
+  attestationId: string;
 }
 
 export type FullCoinData = CoinData & AttestationData;

@@ -1,6 +1,6 @@
 export const hookAddress = '0x86ad5532b8cb1020628bae30e208331fc4c819b2';
-export const schemaId = '0x1a5';
-export const fullSchemaId = 'onchain_evm_84532_0x1a5';
+export const schemaId = '0x22a';
+export const fullSchemaId = 'onchain_evm_84532_0x22a';
 
 // Kind of a giant hack, but it works:
 // we deployed a very light copy of the sign protocol ISP that just makes sure

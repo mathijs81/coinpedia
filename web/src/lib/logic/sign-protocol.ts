@@ -4,7 +4,7 @@ import {
   SignProtocolClient,
   SpMode
 } from '@ethsign/sp-sdk';
-import {decodeAbiParameters, parseAbiParameters, parseEther} from 'viem';
+import {decodeAbiParameters, getAddress, parseAbiParameters, parseEther} from 'viem';
 import {parseSocials, type CoinData, type FullCoinData} from './types';
 import {fullSchemaId, schemaId, userAttesterContract} from './constants';
 
@@ -17,20 +17,23 @@ const index = new IndexService('testnet');
 let defaultContractAddress = '';
 
 export async function attest(
-  coinAddress: string,
+  _coinAddress: string,
   data: CoinData,
   asUser: boolean = false
 ) {
+  const coinAddress = _coinAddress.toLowerCase();
   if (asUser) {
     if (defaultContractAddress === '') {
       defaultContractAddress = (client.client as any).contractInfo.address;
     }
     (client.client as any).contractInfo.address = userAttesterContract;
   } else {
-    (client.client as any).contractInfo.address = defaultContractAddress;
+    if (defaultContractAddress !== '') {
+      (client.client as any).contractInfo.address = defaultContractAddress;
+    }
   }
   const attestationData = {
-    coin: coinAddress,
+    coin: getAddress(coinAddress),
     description: data.description,
     icon: data.icon,
     website: data.website,
@@ -70,12 +73,13 @@ export async function lookup(coinAddress: string): Promise<FullCoinData[]> {
 
   return rows.map(row => {
     const decoded = decodeAbiParameters(
-      parseAbiParameters('string,string,string,string,string'),
+      parseAbiParameters('address,string,string,string,string'),
       row.data as `0x${string}`
     );
     return {
       timestamp: parseFloat(row.attestTimestamp),
       address: row.attester,
+      attestationId: row.id,
       description: decoded[1],
       icon: decoded[2],
       website: decoded[3],

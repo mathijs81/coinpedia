@@ -121,7 +121,6 @@
   };
   let isOwner = false;
   $: onChainData.then(data => {
-    console.log($walletAccount, data?.owner);
     isOwner = addressEquals($walletAccount, data?.owner ?? '');
   });
   $: submitFree = isOwner || $whitelisted;
@@ -286,7 +285,7 @@
         <h3 class="mt-4">History</h3>
         {#each history as attest}
           <div>
-            {attest.timestamp} -- attested by {attest.address}
+            {attest.timestamp} -- attested by {attest.address} <a href={`https://testnet-scan.sign.global/attestation/${attest.attestationId}`} target="_blank"><i class="bi bi-box-arrow-up-right"></i></a>
           </div>
         {/each}
       {/if}
