@@ -68,7 +68,7 @@
           <th class="symbol-col">Symbol</th>
           <th class="name-col">Name</th>
           <th class="desc-col">Description</th>
-          <th class="transact-col">Transfers <small>(last 24h)</small></th>
+          <th class="transact-col">Transfers <small>(last hour)</small></th>
         </tr>
       </thead>
       <tbody>

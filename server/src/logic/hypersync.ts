@@ -9,14 +9,14 @@ export interface HypersyncData {
   transactionCount: number;
 }
 
-async function queryCoins24h(
+async function queryCoins1h(
   chainSetting: ChainSetting,
   topCount: number = 100
 ): Promise<HypersyncData[]> {
   console.log('querying coins!');
   const lastBlock = await getLatestBlock(chainSetting);
-  // block time is 2 seconds, so just count back 24 hours worth of blocks
-  const startBlock = lastBlock - BigInt((24 * 60 * 60) / 2);
+  // block time is 2 seconds, so just count back an hour worth of blocks
+  const startBlock = lastBlock - BigInt((60 * 60) / 2);
 
   // fetch all ERC20 transfers from hypersync
 
@@ -56,7 +56,7 @@ async function queryCoins24h(
   }));
 }
 
-export const getTopTransferredCoins = memoizee(queryCoins24h, {
+export const getTopTransferredCoins = memoizee(queryCoins1h, {
   maxAge: 5 * 60 * 1000,
   promise: true,
 });
