@@ -18,15 +18,15 @@
 
   enum DataUsed {
     CHAIN_ONLY,
-    COINPEDIA,
-    UNCONFIRMED
+    COINPEDIA
+    //UNCONFIRMED
   }
   let dataUsed: DataUsed = DataUsed.COINPEDIA;
 
   $: getIcon = (coin: any) => {
     return (
       (dataUsed !== DataUsed.CHAIN_ONLY ? coin.icon : null) ||
-      (dataUsed === DataUsed.UNCONFIRMED ? coin.apestore?.icon : null) ||
+      //(dataUsed === DataUsed.UNCONFIRMED ? coin.apestore?.icon : null) ||
       UnknownIcon
     );
   };
@@ -34,46 +34,25 @@
   $: getDescription = (coin: any) => {
     return (
       (dataUsed !== DataUsed.CHAIN_ONLY ? coin.description : null) ||
-      (dataUsed === DataUsed.UNCONFIRMED ? coin.apestore?.description : null) ||
+      //(dataUsed === DataUsed.UNCONFIRMED ? coin.apestore?.description : null) ||
+      (coin.apestore?.description && 'ape.store coin') ||
       ``
     );
   };
 </script>
 
 <div class="card">
-  <h3 class="p-2">Top coins on {chainName}</h3>
-  <div class="sticky-top bg-light px-3">
-    Show
-    <div class="d-flex flex-row">
-      <div class="col d-flex flex-row">
-        <input
-          type="radio"
-          id="chain-only"
-          bind:group={dataUsed}
-          value={DataUsed.CHAIN_ONLY}
-          class="form-check-input me-2" /><label for="chain-only">Only ERC-20 data</label>
-      </div>
-      <div class="col d-flex flex-row">
-        <input
-          type="radio"
-          id="coinpedia-data"
-          bind:group={dataUsed}
-          value={DataUsed.COINPEDIA}
-          class="form-check-input me-2" /><label for="coinpedia-data"
-          >ERC-20 & attested Coinpedia data</label>
-      </div>
-      {#if chain == 'base'}
-        <div class="col  d-flex flex-row">
-          <input
-            type="radio"
-            id="unconfirmed-data"
-            bind:group={dataUsed}
-            value={DataUsed.UNCONFIRMED}
-            class="form-check-input me-2" /><label for="unconfirmed-data"
-            >ERC-20, Coinpedia & unconfirmed data</label>
-        </div>
+  <div>
+    <span class="float-end p-2">
+      {#if dataUsed === DataUsed.CHAIN_ONLY}
+        <span class="text-muted" on:click={() => (dataUsed = DataUsed.COINPEDIA)}
+          ><i class="bi bi-eye-slash" title="Showing ERC-20 data only"></i></span>
+      {:else}
+        <span class="text-muted" on:click={() => (dataUsed = DataUsed.CHAIN_ONLY)}
+          ><i class="bi bi-eye" title="Showing ERC-20 & attested Coinpedia data"></i></span>
       {/if}
-    </div>
+    </span>
+    <h3 class="p-2">Top coins on {chainName}</h3>
   </div>
   {#if coins.length === 0 && !errorMessage}
     <div class="loader-container">
@@ -105,7 +84,8 @@
           </tr>
         {/each}
       </tbody>
-    </table>{/if}</div>
+    </table>{/if}
+</div>
 
 <style>
   table {
@@ -137,8 +117,9 @@
     width: 10ch;
   }
   .card {
+    overflow-x: auto;
   }
-  .card > * {
+  table {
     min-width: 600px;
   }
 </style>
