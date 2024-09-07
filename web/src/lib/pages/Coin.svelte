@@ -9,12 +9,13 @@
   import {useAuth} from '$lib/auth/methods';
   import {getIconName, SocialNetwork, type CoinData} from '$lib/logic/types';
   import {apeStoreImport, fetchCoinData} from '$lib/logic/server-data';
+    import { getAddress } from 'viem';
 
   const {connect} = useAuth();
 
   let chain = toChainString($page.params.chain);
   activeChain.set(fromString(chain));
-  let address = $page.params.address as `0x${string}`;
+  let address = getAddress($page.params.address).toLowerCase() as `0x${string}`;
   const onChainData = getOnchain(chain, address);
   const attestations = lookup(address);
 
@@ -27,6 +28,9 @@
       }
     }
   });
+
+  $: blockchainAddress = (chain == 'base' ? `https://basescan.org/token/${address}` :
+    `https://sepolia.basescan.org/token/${address}`);
 
   let description = '';
   let website = '';
@@ -45,7 +49,6 @@
       iconUrl = data.icon;
 
       data.socials.forEach(social => {
-        console.log('social: ', social);
         if (social.type === SocialNetwork.X) {
           xUrl = social.url;
         } else if (social.type === SocialNetwork.DISCORD) {
@@ -166,11 +169,11 @@
         <b>Description</b>
         <p>{current.description}</p>
         <b>Blockchain address</b>
-        <p>{address}</p>
+        <p>{address} <a href={blockchainAddress} target="_blank"><i class="bi bi-box-arrow-up-right"></i></a></p>
       {:else}
         <h3>{data.name} <code>({data.symbol})</code></h3>
         <b>Blockchain address</b>
-        <p>{address}</p>
+        <p>{address} <a href={blockchainAddress} target="_blank"><i class="bi bi-box-arrow-up-right"></i></a></p>
         <p>{data.symbol} has no attested metadata yet</p>
       {/if}
     {/await}
@@ -258,7 +261,7 @@
             id="telegramUrl"
             bind:value={telegramUrl}
             class="form-control"
-            placeholder="Telegram URL" />Ξ
+            placeholder="Telegram URL" />
         </div>
         <div class="input-group mb-2">
           <span class="input-group-text"><i class="bi bi-discord"></i></span>
@@ -282,7 +285,7 @@
       {#if history && history.length > 0}
         <h3 class="mt-4">History</h3>
         {#each history as attest}
-          <div class="row">
+          <div>
             {attest.timestamp} -- attested by {attest.address}
           </div>
         {/each}

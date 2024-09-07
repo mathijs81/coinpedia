@@ -35,7 +35,7 @@
     return (
       (dataUsed !== DataUsed.CHAIN_ONLY ? coin.description : null) ||
       (dataUsed === DataUsed.UNCONFIRMED ? coin.apestore?.description : null) ||
-      `${coin.name} is an ERC-20 token on ${chainName}`
+      ``
     );
   };
 </script>

@@ -62,7 +62,7 @@ export async function lookup(coinAddress: string): Promise<FullCoinData[]> {
   // TODO: different chains?
   const result = await index.queryAttestationList({
     schemaId: fullSchemaId,
-    indexingValue: coinAddress,
+    indexingValue: coinAddress.toLowerCase(),
     page: 1
   });
   const rows = result?.rows;
