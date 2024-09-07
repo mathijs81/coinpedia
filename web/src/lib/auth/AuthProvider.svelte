@@ -30,7 +30,10 @@
 
   const onboard = Onboard({
     chains: chains,
-    wallets: [injectedWallet()]
+    wallets: [injectedWallet()],
+    connect: {
+      autoConnectLastWallet: true
+    }
   });
 
   async function OnWalletsStateChange(walletState: WalletState[]) {
