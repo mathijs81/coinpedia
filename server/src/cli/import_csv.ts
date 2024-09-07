@@ -32,7 +32,7 @@ async function attest(
     description,
     icon: iconUrl,
     website: website,
-    socials: JSON.stringify(socials),
+    socials,
   };
   return await client.createAttestation({
     schemaId: schemaIdHex,
