@@ -42,3 +42,4 @@ export const chains = {
 export const signProtocolAddress = '0x4e4af2a21ebf62850fD99Eb6253E1eFBb56098cD';
 export const schemaId = 421; // 0x1a5
 export const schemaIdHex = '0x1a5';
+export const fullSchemaId = 'onchain_evm_84532_0x1a5';
