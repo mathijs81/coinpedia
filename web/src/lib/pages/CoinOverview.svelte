@@ -137,7 +137,6 @@
     width: 10ch;
   }
   .card {
-    overflow-x: auto;
   }
   .card > * {
     min-width: 600px;
