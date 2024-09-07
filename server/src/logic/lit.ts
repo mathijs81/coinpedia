@@ -25,6 +25,8 @@ const signer = new ethers.Wallet(
   new ethers.JsonRpcProvider(LIT_RPC.CHRONICLE_YELLOWSTONE)
 );
 
+// Run a lit task to fetch ape.store data from their API and use a PKP key
+// to sign a transaction to attest that data on Sign Protocol
 export async function runTask(coinAddress: string) {
   const sessionSigs = await litNodeClient.getSessionSigs({
     chain: 'ethereum',
@@ -106,10 +108,10 @@ return '';
   address, tokenData.description ?? '',
   iconUrl ?? '', tokenData.website ?? '',
     // TODO socials: parseSocials(tokenData),
-    '{}'
+    '[]'
   ];
   const schemaDataBytes = ethers.utils.defaultAbiCoder.encode(
-    ['string', 'string', 'string', 'string', 'string'],
+    ['address', 'string', 'string', 'string', 'string'],
     schemaData
   );
 
