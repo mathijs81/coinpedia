@@ -9,7 +9,8 @@
   import {useAuth} from '$lib/auth/methods';
   import {getIconName, SocialNetwork, type CoinData} from '$lib/logic/types';
   import {apeStoreImport, fetchCoinData} from '$lib/logic/server-data';
-    import { getAddress } from 'viem';
+  import {getAddress} from 'viem';
+  import {fromUnixTime, formatDistance} from 'date-fns';
 
   const {connect} = useAuth();
 
@@ -29,8 +30,10 @@
     }
   });
 
-  $: blockchainAddress = (chain == 'base' ? `https://basescan.org/token/${address}` :
-    `https://sepolia.basescan.org/token/${address}`);
+  $: blockchainAddress =
+    chain == 'base'
+      ? `https://basescan.org/token/${address}`
+      : `https://sepolia.basescan.org/token/${address}`;
 
   let description = '';
   let website = '';
@@ -40,6 +43,8 @@
   let xUrl = '';
   let discordUrl = '';
   let telegramUrl = '';
+
+  let owner = '';
 
   const currentData = attestations.then(attestations => {
     if (attestations.length > 0) {
@@ -121,6 +126,7 @@
   };
   let isOwner = false;
   $: onChainData.then(data => {
+    owner = data?.owner ?? '';
     isOwner = addressEquals($walletAccount, data?.owner ?? '');
   });
   $: submitFree = isOwner || $whitelisted;
@@ -168,11 +174,17 @@
         <b>Description</b>
         <p>{current.description}</p>
         <b>Blockchain address</b>
-        <p>{address} <a href={blockchainAddress} target="_blank"><i class="bi bi-box-arrow-up-right"></i></a></p>
+        <p>
+          {address}
+          <a href={blockchainAddress} target="_blank"><i class="bi bi-box-arrow-up-right"></i></a>
+        </p>
       {:else}
         <h3>{data.name} <code>({data.symbol})</code></h3>
         <b>Blockchain address</b>
-        <p>{address} <a href={blockchainAddress} target="_blank"><i class="bi bi-box-arrow-up-right"></i></a></p>
+        <p>
+          {address}
+          <a href={blockchainAddress} target="_blank"><i class="bi bi-box-arrow-up-right"></i></a>
+        </p>
         <p>{data.symbol} has no attested metadata yet</p>
       {/if}
     {/await}
@@ -285,7 +297,18 @@
         <h3 class="mt-4">History</h3>
         {#each history as attest}
           <div>
-            {attest.timestamp} -- attested by {attest.address} <a href={`https://testnet-scan.sign.global/attestation/${attest.attestationId}`} target="_blank"><i class="bi bi-box-arrow-up-right"></i></a>
+            <span title={fromUnixTime(attest.timestamp / 1000).toString()}
+              >{formatDistance(fromUnixTime(attest.timestamp / 1000), new Date(), {
+                addSuffix: true
+              })}</span>
+            &mdash; updated by {formatAddress(
+              attest.address
+            )}{#if addressEquals(attest.address, owner)}<span
+                class="badge rounded-pill text-bg-success">OWNER</span
+              >{/if}
+            <a
+              href={`https://testnet-scan.sign.global/attestation/${attest.attestationId}`}
+              target="_blank"><i class="bi bi-box-arrow-up-right"></i></a>
           </div>
         {/each}
       {/if}

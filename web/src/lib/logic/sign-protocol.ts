@@ -4,7 +4,12 @@ import {
   SignProtocolClient,
   SpMode
 } from '@ethsign/sp-sdk';
-import {decodeAbiParameters, getAddress, parseAbiParameters, parseEther} from 'viem';
+import {
+  decodeAbiParameters,
+  getAddress,
+  parseAbiParameters,
+  parseEther
+} from 'viem';
 import {parseSocials, type CoinData, type FullCoinData} from './types';
 import {fullSchemaId, schemaId, userAttesterContract} from './constants';
 
