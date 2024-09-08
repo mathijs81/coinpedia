@@ -327,7 +327,7 @@
 
 <style lang="scss">
   .icon {
-    max-width: 96px;
-    max-height: 96px;
+    width: 96px;
+    height: 96px;
   }
 </style>
