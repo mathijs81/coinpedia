@@ -25,7 +25,7 @@ $card-border-color: $border-color;
 @import 'bootstrap-icons/font/bootstrap-icons.css';
 
 h1,
-h2,
+h2:not(.accordion-header),
 h3,
 h4,
 h5,

@@ -34,6 +34,7 @@
   },
   "dependencies": {
     "@ethsign/sp-sdk": "^0.7.2",
+    "@sveltestrap/sveltestrap": "^6.2.7",
     "@web3-onboard/core": "^2.22.2",
     "@web3-onboard/injected-wallets": "^2.11.2",
     "bootstrap": "^5.3.3",

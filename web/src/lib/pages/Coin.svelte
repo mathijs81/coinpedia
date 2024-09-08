@@ -11,6 +11,7 @@
   import {apeStoreImport, fetchCoinData} from '$lib/logic/server-data';
   import {getAddress} from 'viem';
   import {fromUnixTime, formatDistance} from 'date-fns';
+  import {Accordion, AccordionItem} from '@sveltestrap/sveltestrap';
 
   const {connect} = useAuth();
 
@@ -173,14 +174,14 @@
         </div>
         <b>Description</b>
         <p>{current.description}</p>
-        <b>Blockchain address</b>
+        <b>Contract address</b>
         <p>
           {address}
           <a href={blockchainAddress} target="_blank"><i class="bi bi-box-arrow-up-right"></i></a>
         </p>
       {:else}
         <h3>{data.name} <code>({data.symbol})</code></h3>
-        <b>Blockchain address</b>
+        <b>Contract address</b>
         <p>
           {address}
           <a href={blockchainAddress} target="_blank"><i class="bi bi-box-arrow-up-right"></i></a>
@@ -190,25 +191,31 @@
     {/await}
 
     {#if Object.keys(apeStoreData).length > 0}
-      <h3>Ape.Store</h3>
-      <div>
-        This is a coin that's created on ape.store. Coinpedia can import / refresh the metadata from
-        their feed.
-      </div>
-      <b>Preview</b>
-      <div>
-        <img src={apeStoreData.icon} alt="icon" class="icon me-2" /><br />
-        {#if apeStoreData.website}
-          <a href={apeStoreData.website}>{apeStoreData.website}</a><br />
-        {/if}
-        {apeStoreData.description}
-      </div>
-      {#if importResult}
-        <div>Server response:</div>
-        <code>{importResult}</code>
-      {:else}
-        <button class="btn btn-primary" on:click={handleImport}>Import from ape.store</button>
-      {/if}
+      <Accordion>
+        <AccordionItem>
+          <span slot="header"><b>Ape.store</b> has data about this coin</span>
+          <div>
+            <div>
+              This is a coin that's created on ape.store. Coinpedia can import / refresh the
+              metadata from their feed.
+            </div>
+            <b>Preview</b>
+            <div>
+              <img src={apeStoreData.icon} alt="icon" class="icon me-2" /><br />
+              {#if apeStoreData.website}
+                <a href={apeStoreData.website}>{apeStoreData.website}</a><br />
+              {/if}
+              {apeStoreData.description}
+            </div>
+            {#if importResult}
+              <div>Server response:</div>
+              <code>{importResult}</code>
+            {:else}
+              <button class="btn btn-primary" on:click={handleImport}>Import from ape.store</button>
+            {/if}
+          </div>
+        </AccordionItem>
+      </Accordion>
     {/if}
 
     <h3 class="mt-3">Submit update</h3>
