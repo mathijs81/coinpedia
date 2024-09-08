@@ -11,8 +11,8 @@
 <div>
   <h2>Welcome to Coinpedia</h2>
   <p>
-    Coinpedia is a permissionless, onchain store of information about ERC-20 coins (on Base and Base
-    Sepolia at this moment).
+    Coinpedia is a permissionless, onchain store for ERC-20 token metadata, allowing updates to
+    logos, descriptions, and links by coin owners, offchain APIs or other users.
   </p>
   <p>
     You can see the top coins below. You can update missing or outdated information. To maintain
